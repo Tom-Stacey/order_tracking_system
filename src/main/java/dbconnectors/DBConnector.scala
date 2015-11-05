@@ -5,6 +5,7 @@ package dbconnectors
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet
+import java.sql.PreparedStatement
 
 /**
  * @author tstacey
@@ -52,14 +53,34 @@ class DBConnector {
         statement.executeUpdate(sql)
     }
     
-    def doPreparedQuery(sql:String, variables:Map[String,String]):ResultSet = {
+    def doPreparedQuery(sql:String, variables:Array[Array[String]]):ResultSet = {
       val pStatement = connection.prepareStatement(sql)
-      //variables.keys.foreach{
-      
-      
+      addVariablesToPreparedStatement(0, pStatement, variables)
+      pStatement.executeQuery()
     }
     
+    def addVariablesToPreparedStatement(index:Int, pStatement:PreparedStatement, variables:Array[Array[String]]):Unit = {
+      variables(index)(0).toLowerCase() match {
+        case "string" => addString(pStatement, index.+(1), variables(index)(1))
+        case "int" => addInt(pStatement, index.+(1), variables(index)(1))
+        case "double" => addDouble(pStatement, index.+(1), variables(index)(1))
+      }
+      if(index < variables.length.-(1)) {
+        addVariablesToPreparedStatement(index.+(1),pStatement,variables)
+      }
+    }
     
+    private def addString(pStatement:PreparedStatement, index:Int, value:String) {
+      pStatement.setString(index, value)
+    }
+    
+    private def addInt(pStatement:PreparedStatement, index:Int, value:String) {
+      pStatement.setInt(index, value.toInt)
+    }
+    
+    private def addDouble(pStatement:PreparedStatement, index:Int, value:String) {
+      pStatement.setDouble(index, value.toDouble)
+    }
     
 }
 
@@ -68,9 +89,9 @@ object DBTest {
    def main(args: Array[String]): Unit = {
      val dbCon = new DBConnector()
      dbCon.connect()
-     dbCon.doSimpleUpdate("insert into user(password, forename, surname, email, isEmployee) values ('pswrd', 'Al', 'Stock', 'Al.Stock@NBGrdns.co.uk', true)")
-     // do resultset things
-     val rs = dbCon.doSimpleQuery("SELECT * FROM user")
+     val varArray:Array[Array[String]] = Array(Array("Int","1"))
+    
+     val rs = dbCon.doPreparedQuery("SELECT forename FROM user WHERE idUser = ?", varArray)
      val pm = new PrintModule()
      pm.printResultSet(rs)
      rs.close()
