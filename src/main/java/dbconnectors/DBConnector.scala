@@ -53,13 +53,30 @@ class DBConnector {
         statement.executeUpdate(sql)
     }
     
+    /**
+     * creates a prepared statement from the passed SQL string and variable pairs and queries the database
+     * @param sql - the SQL string to be executed
+     * @param variables - a 2-dimensional array of variableType/variableValue pairs (e.g. "Int","2") to be inserted into the prepared statement
+     */
     def doPreparedQuery(sql:String, variables:Array[Array[String]]):ResultSet = {
       val pStatement = connection.prepareStatement(sql)
       addVariablesToPreparedStatement(0, pStatement, variables)
       pStatement.executeQuery()
     }
     
-    def addVariablesToPreparedStatement(index:Int, pStatement:PreparedStatement, variables:Array[Array[String]]):Unit = {
+    /**
+     * creates a prepared statement from the passed SQL string and variable pairs and updates the database
+     */
+    def doPreparedUpdate(sql:String, variables:Array[Array[String]]):Unit = {
+      val pStatement = connection.prepareStatement(sql)
+      addVariablesToPreparedStatement(0, pStatement, variables)
+      pStatement.executeUpdate()
+    }
+    
+    /**
+     * recursive function to move through all variable pairs in the passed array and assign them to the passed statement
+     */
+    private def addVariablesToPreparedStatement(index:Int, pStatement:PreparedStatement, variables:Array[Array[String]]):Unit = {
       variables(index)(0).toLowerCase() match {
         case "string" => addString(pStatement, index.+(1), variables(index)(1))
         case "int" => addInt(pStatement, index.+(1), variables(index)(1))
@@ -70,14 +87,23 @@ class DBConnector {
       }
     }
     
+    /**
+     * adds a String to the passed prepared statement at the passed index
+     */
     private def addString(pStatement:PreparedStatement, index:Int, value:String) {
       pStatement.setString(index, value)
     }
     
+    /**
+     * adds an Int to the passed prepared statement at the passed index
+     */
     private def addInt(pStatement:PreparedStatement, index:Int, value:String) {
       pStatement.setInt(index, value.toInt)
     }
     
+    /**
+     * adds a Double to the passed prepared statement at the passed index
+     */
     private def addDouble(pStatement:PreparedStatement, index:Int, value:String) {
       pStatement.setDouble(index, value.toDouble)
     }
