@@ -1,26 +1,21 @@
 package dbconnectors
 
-import org.mongodb.scala._
+import com.mongodb.casbah.Imports._
 
 /**
  * @author tstacey
  */
 class MongoConnector {
-  val mongoClient: MongoClient = MongoClient()
-  val database: MongoDatabase = mongoClient.getDatabase("warehouseTracking")
+  val mongoClient: MongoClient = MongoClient("localhost", 27017)
   
-  val collection:MongoCollection[Document] = database.getCollection("addresses")
+  val database = mongoClient("warehouseTracking")
+  val collection = database("addresses")
   
-  val query = Document("AddressID" -> 1) 
   
   def tst():Unit = {
-    println("here")
-        collection.find(query).subscribe(
-      (addr: Document) => println(addr.toJson()),                         // onNext
-      (error: Throwable) => println(s"Query failed: ${error.getMessage}"), // onError
-      () => println("Done")                                               // onComplete
-    )
-    println("here")
+    val allDocs = collection.find()
+    println( allDocs )
+    for(doc <- allDocs) println( doc )
   }
   
   def close() = {
