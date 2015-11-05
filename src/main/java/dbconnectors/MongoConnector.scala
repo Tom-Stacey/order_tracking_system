@@ -12,13 +12,9 @@ object MongoConnector {
   val database = mongoClient("warehouseTracking")
   val addressCollection = database("addresses")
   
-  
-  def tst():Unit = {
-    val allDocs = addressCollection.find()
-    println( allDocs )
-    for(doc <- allDocs) println( doc )
-  }
-  
+  /**
+   * returns an address entity from the MongoDB corresponding to the passed address ID
+   */
   def getAddress(addressID:Int):Address = {
     val queryObject = MongoDBObject("AddressID" -> addressID)
     val addrDoc = addressCollection.findOne(queryObject)
@@ -29,6 +25,9 @@ object MongoConnector {
     mongoClient.close()
   }
   
+  /**
+   * returns an Address Entity from a mongo object
+   */
   private def makeAddressEntityFromMongoDBObject(addrObj:MongoDBObject):Address = {
     val addrLines:Map[String,String] = addrObj.getAs[Map[String,String]]("AddressLines").get
     Address(addrObj.getAs[Double]("AddressID").get.toInt, addrLines, addrObj.getAs[String]("City").get, addrObj.getAs[String]("County").get, addrObj.getAs[String]("PostCode").get)
