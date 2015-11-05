@@ -1,9 +1,6 @@
 package dbconnectors
 
-import org.mongodb.scala.MongoClient
-import org.mongodb.scala.MongoDatabase
-import org.mongodb.scala.MongoCollection
-import org.mongodb.scala.bson.collection.mutable.Document
+import org.mongodb.scala._
 
 /**
  * @author tstacey
@@ -14,8 +11,16 @@ class MongoConnector {
   
   val collection:MongoCollection[Document] = database.getCollection("addresses")
   
+  val query = Document("AddressID" -> 1) 
+  
   def tst():Unit = {
-      collection.find().first()
+    println("here")
+        collection.find(query).subscribe(
+      (addr: Document) => println(addr.toJson()),                         // onNext
+      (error: Throwable) => println(s"Query failed: ${error.getMessage}"), // onError
+      () => println("Done")                                               // onComplete
+    )
+    println("here")
   }
   
   def close() = {
