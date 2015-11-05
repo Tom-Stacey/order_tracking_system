@@ -5,16 +5,16 @@ import java.time.LocalDateTime
 /**
  * @author tstacey
  */
-class CustomerOrder(idCustomerOrder:Int, idCustomerOrderLine:Int) {
-  var datePlaced:Option[Int] = None;
+case class CustomerOrder(idCustomerOrder:Int,
+                          idCustomerOrderLine:Int) {
   
   def changeOrderLineID(newOrderLineNumber:Int):CustomerOrder = {
    new CustomerOrder(idCustomerOrder, newOrderLineNumber);
   }
   
-  def setDatePlaced(newDate:Int) {
-    datePlaced = Some(newDate);
-  }
+  /*
+  
+  var datePlaced:Option[Int] = None;
   
   def getDatePlaced():Int = {
     datePlaced.getOrElse(
@@ -23,12 +23,16 @@ class CustomerOrder(idCustomerOrder:Int, idCustomerOrderLine:Int) {
               }
             );
   }
+  def setDatePlaced(newDate:Int) {
+    datePlaced = Some(newDate);
+  }
+  
   
   def getOption():Option[Int] = {
     datePlaced;
   }
   
-  
+  */
   
   
 }
@@ -37,12 +41,7 @@ object custTest {
   
   def main(args: Array[String]): Unit = {
     val cust = new CustomerOrder(2,2);
-    cust.setDatePlaced(4);
-    try {
-      val i:Option[Int] = cust.getOption();
-      println(i);
-    } catch {
-      case e:Exception => println("errorz");
-    }
+    val cust2 = cust.copy(idCustomerOrder = 6) 
+    println(cust2.idCustomerOrderLine)
   }
 }

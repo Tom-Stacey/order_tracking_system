@@ -10,7 +10,7 @@ import java.sql.PreparedStatement
 /**
  * @author tstacey
  */
-class DBConnector {
+object SQLConnector {
     val driver = "com.mysql.jdbc.Driver"
     val url = "jdbc:mysql://localhost/mydb"
     val username = "root"
@@ -113,15 +113,14 @@ class DBConnector {
 object DBTest {
  
    def main(args: Array[String]): Unit = {
-     val dbCon = new DBConnector()
-     dbCon.connect()
+     SQLConnector.connect()
      val varArray:Array[Array[String]] = Array(Array("Int","1"))
     
-     val rs = dbCon.doPreparedQuery("SELECT forename FROM user WHERE idUser = ?", varArray)
+     val rs = SQLConnector.doPreparedQuery("SELECT forename FROM user WHERE idUser = ?", varArray)
      val pm = new PrintModule()
      pm.printResultSet(rs)
      rs.close()
-     dbCon.disconnect()
+     SQLConnector.disconnect()
    }
  
 }
