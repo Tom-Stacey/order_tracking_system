@@ -6,11 +6,13 @@ import java.time.LocalDateTime
  * @author tstacey
  */
 case class CustomerOrder(idCustomerOrder:Int,
-                          idCustomerOrderLine:Int) {
+                          datePlaced:LocalDateTime,
+                          dateShipped:Option[LocalDateTime],
+                          shippingAddress:Address,
+                          orderStatus:CustomerOrderStatus,
+                          orderEmployee:Employee,
+                          orderCustomer:Customer) {
   
-  def changeOrderLineID(newOrderLineNumber:Int):CustomerOrder = {
-   new CustomerOrder(idCustomerOrder, newOrderLineNumber);
-  }
   
   /*
   
@@ -40,8 +42,5 @@ case class CustomerOrder(idCustomerOrder:Int,
 object custTest {
   
   def main(args: Array[String]): Unit = {
-    val cust = new CustomerOrder(2,2);
-    val cust2 = cust.copy(idCustomerOrder = 6) 
-    println(cust2.idCustomerOrderLine)
   }
 }

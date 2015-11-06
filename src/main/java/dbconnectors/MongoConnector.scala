@@ -38,13 +38,18 @@ object MongoConnector {
         addrObj.getAs[String]("PostCode").get)
   }
   
-  
+  /**
+   * returns an Item entity from the MongoDB corresponding to the passed item ID
+   */
   def getItem(itemID:Int):Item = {
     val queryObject = MongoDBObject("ItemID" -> itemID)
     val itemDoc = itemCollection.findOne(queryObject)
     makeItemEntityFromMongoDBObject(itemDoc.get)
   }
   
+  /**
+   * returns an Item Entity from a mongo object
+   */
   private def makeItemEntityFromMongoDBObject(itemObj:MongoDBObject):Item = {
     val itemAttributes:Map[String,String] = itemObj.getAs[Map[String,String]]("ItemAttributes").get
     Item(itemObj.getAs[Double]("ItemID").get.toInt,
