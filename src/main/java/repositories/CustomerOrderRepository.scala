@@ -4,33 +4,42 @@ import java.sql.ResultSet
 import dbconnectors.SQLConnector
 import dbconnectors.MongoConnector
 import entities.Address
+import entities.CustomerOrderStatus
 
 
 /**
  * @author tstacey
  */
 class CustomerOrderRepository {
-  
+  val statusRepo:CustomerOrderStatusRepository = new CustomerOrderStatusRepository()
   val connector = new SQLConnector();
   
+  /**
+   * returns a CustomerOrder entity corresponding to the passed customerOrderID
+   */
   def getCustomerOrder(customerOrderID:Int) {
     val sql:String = "SELECT idCustomerOrder, datePlaced, dateShipped, isPaid, idAddress, idCustomerOrderStatus, idEmployee, idCustomer "+
                   "FROM customerorder WHERE idCustomerOrder = ?"
     val vars:Array[Array[String]] = Array(Array("Int",customerOrderID.toString()))
     connector.connect()
-    val rs:ResultSet = connector.doPreparedQuery(sql, vars)
-    createCustomerOrderFromResultSet(rs)
-    connector.disconnect()
+    try {
+      val rs:ResultSet = connector.doPreparedQuery(sql, vars)
+      rs.next()
+      createCustomerOrderFromResultSet(rs)
+    } finally {
+      connector.disconnect()
+    }
+    
+   
   }
   
+  /**
+   * returns a single CustomerOrder entity from the passed ResultSet at the ResultSet's current line
+   */
   private def createCustomerOrderFromResultSet(rs:ResultSet) {
-    if(rs!=null) {
-      rs.next()
+    
       val addr:Address = MongoConnector.getAddress(rs.getInt("idAddress"))
-      
-    } else {
-      throw new Error("Couldn't find Customer Order in CustomerOrderRepository")
-    }
+      val status:CustomerOrderStatus = statusRepo.getStatus(rs.getInt("idCustomerOrderStatus"))
   }
   
 }

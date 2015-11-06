@@ -19,9 +19,15 @@ class CustomerOrderStatusRepository {
    */
   def getAllStatuses():SortedMap[Int,CustomerOrderStatus] = {
     val sql:String = "SELECT idCustomerOrderStatus, status FROM customerorderstatus ORDER BY idCustomerOrderStatus"
-    connector.connect();
-    val rs:ResultSet = connector.doSimpleQuery(sql)
-    createMapFromResultSet(rs)
+    connector.connect()
+    try {
+      val rs:ResultSet = connector.doSimpleQuery(sql)
+      val map = createMapFromResultSet(rs)
+      map
+    } finally {
+      connector.disconnect()
+    }
+    
   }
   
   /**
@@ -52,9 +58,29 @@ class CustomerOrderStatusRepository {
 }
 
 object CustOrdStatusTest {
+  
   def main(args: Array[String]): Unit = {
+    /*
     val tst = new CustomerOrderStatusRepository()
     val a = tst.getStatus(2)
       println("ID: "+a.statusID+" Val: "+a.status)
+      */
+  executeOption { selectOption(1) }  
+    
+    
+    def selectOption[T](selection: Int) = {
+      selection match {
+        case 1 =>
+            (a:T) => println("Added "+a)
+        case 2 =>
+            (a:T) => println("Deleted "+a)
+        case _ =>
+            (a:T) => println("Unknown "+a)
+      }
+    }
+    
+    def executeOption(selection:(Any) => Unit) {
+      selection("bvh")
+    }
   }
 }
