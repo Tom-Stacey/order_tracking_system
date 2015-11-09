@@ -66,6 +66,9 @@ class PurchaseOrderLineRepository {
     
   }
   
+  /**
+   * returns an Option[Int] of the quantity damaged if the quantityDamaged Column is not null. Returns None if null
+   */
   private def getQuantityDamaged(rs:ResultSet):Option[Int] = {
     val chk = rs.getInt("quantityDamaged")
     if(!rs.wasNull()) {
@@ -75,6 +78,16 @@ class PurchaseOrderLineRepository {
       }
     }
     
-  
-  
 }
+
+object PurchaseOrdLineTst {
+  def main(args: Array[String]): Unit = {
+    val tst = new PurchaseOrderLineRepository()
+    val lines = tst.getPurchaseOrderLines(1)
+    for(x <- lines) {
+      x.print()
+      println()
+    }
+  }
+}
+

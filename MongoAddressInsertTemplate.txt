@@ -1,22 +1,12 @@
 db.addresses.insert (
 	{
-		"AddressID" : 1,
+		"AddressID" : 3,
 		"AddressLines" : {
-			"AddressLine1" : "Primrose House",
-			"AddressLine2" : "16 Highbridge Road",
-			"AddressLine3" : "Crumblington Estate"
+			"AddressLine1" : "Big Fun Gardens Ltd",
+			"AddressLine2" : "25 High Road"
 		},
-		"City" : "Knaresborough",
-		"County" : "North Yorkshire",
-		"PostCode" : "KN3 2JW"
-	},
-	{
-		"AddressID" : 2,
-		"AddressLines" : {
-			"AddressLine1" : "54 Badger Lane"
-		},
-		"City" : "Weston Super Mare",
-		"County" : "Somerset",
-		"PostCode" : "BS37 5TJ"
+		"City" : "Bromsgrove",
+		"County" : "Worcestershire",
+		"PostCode" : "B62 3JA"
 	}
 )
