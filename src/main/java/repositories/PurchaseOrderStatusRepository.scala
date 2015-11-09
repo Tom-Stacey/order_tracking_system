@@ -15,7 +15,7 @@ class PurchaseOrderStatusRepository {
   
   
   /**
-   * returns an array of all PurchaseOrderStatuses in the SQL database, ordered by statusID
+   * returns a map of all PurchaseOrderStatuses in the SQL database, ordered by statusID
    */
   def getAllStatuses():SortedMap[Int,PurchaseOrderStatus] = {
     val sql:String = "SELECT idPurchaseOrderStatus, status FROM purchaseorderstatus ORDER BY idPurchaseOrderStatus"
