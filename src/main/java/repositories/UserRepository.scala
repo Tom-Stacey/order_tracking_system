@@ -30,7 +30,7 @@ class UserRepository {
   /**
    * returns a single User entity from the passed ResultSet at the ResultSet's current row
    */
-  def createUserFromResultSet(rs:ResultSet):User = {
+  private def createUserFromResultSet(rs:ResultSet):User = {
     new User(rs.getInt("idUser"),rs.getString("password"),rs.getString("forename"),rs.getString("surname"),rs.getString("email"), rs.getBoolean("isEmployee"))
   }
   

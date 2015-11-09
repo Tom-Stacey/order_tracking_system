@@ -5,6 +5,7 @@ import entities.Customer
 import dbconnectors.SQLConnector
 import entities.User
 import java.time.LocalDate
+import helpers.DateTimeConverter
 
 /**
  * @author tstacey
@@ -12,6 +13,8 @@ import java.time.LocalDate
 class CustomerRepository {
   val connector = new SQLConnector()
   val userRepo = new UserRepository()
+  val dateConv = new DateTimeConverter()
+  
   /**
    * returns a Customer Entity corresponding to the passed custID
    */
@@ -31,11 +34,19 @@ class CustomerRepository {
   /**
    * returns a single Customer entity from the passed ResultSet at the ResultSet's current row
    */
-  def createUserFromResultSet(rs:ResultSet):Customer = {
+  private def createUserFromResultSet(rs:ResultSet):Customer = {
     val birth = rs.getDate("dateOfBirth")
-    val dob = LocalDate.of(birth.getYear(), birth.getMonth(), birth.getDay)
+    val dob = dateConv.convertDateToLocalDate(birth)
     val usr = userRepo.getUser(rs.getInt("idUser"))
     new Customer(usr,dob,rs.getFloat("credit"),rs.getString("phoneNumber"),rs.getInt("blackStrikes"))
   }
   
+}
+
+
+object CustRepoTst {
+  def main(args: Array[String]): Unit = {
+    val tst = new CustomerRepository()
+    tst.getCustomer(1).print()
+  }
 }

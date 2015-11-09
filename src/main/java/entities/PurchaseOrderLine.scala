@@ -3,6 +3,6 @@ package entities
 /**
  * @author tstacey
  */
-case class PurchaseOrderLine(purchaseOrder:PurchaseOrder, item:Item, quantity:Int, quantityDamaged:Option[Int]) {
+case class PurchaseOrderLine(item:Item, purchaseOrder:PurchaseOrder, quantity:Int, quantityDamaged:Option[Int]) {
   
 }
