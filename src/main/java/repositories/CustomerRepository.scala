@@ -36,7 +36,7 @@ class CustomerRepository {
    */
   private def createUserFromResultSet(rs:ResultSet):Customer = {
     val birth = rs.getDate("dateOfBirth")
-    val dob = dateConv.convertDateToLocalDate(birth)
+    val dob = dateConv.convertSQLDateToLocalDate(birth)
     val usr = userRepo.getUser(rs.getInt("idUser"))
     new Customer(usr,dob,rs.getFloat("credit"),rs.getString("phoneNumber"),rs.getInt("blackStrikes"))
   }

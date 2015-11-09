@@ -43,7 +43,7 @@ class PurchaseOrderRepository {
    */
   private def createPurchaseOrderFromResultSetRow(rs:ResultSet):PurchaseOrder = {
     val id = rs.getInt("idPurchaseOrder")
-    val datePlaced = dateConverter.convertDateToLocalDate(rs.getDate("datePlaced"))
+    val datePlaced = dateConverter.convertSQLDateToLocalDate(rs.getDate("datePlaced"))
     val dateExpected = getDateOptionFromResultSet(rs, "dateExpected")
     val status = statusRepo.getStatus(rs.getInt("idPurchaseOrderStatus"))
     val supplier = supplierRepo.getSupplier(rs.getInt("idSupplier"))
@@ -58,7 +58,7 @@ class PurchaseOrderRepository {
   private def getDateOptionFromResultSet(rs:ResultSet, columnName:String):Option[LocalDate] = {
     val date = rs.getDate(columnName)
     if(!rs.wasNull()) {
-      Option(dateConverter.convertDateToLocalDate(date))
+      Option(dateConverter.convertSQLDateToLocalDate(date))
     } else {
       None
     }

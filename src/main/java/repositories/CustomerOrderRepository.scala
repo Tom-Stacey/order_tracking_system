@@ -37,8 +37,6 @@ class CustomerOrderRepository {
     } finally {
       connector.disconnect()
     }
-    
-   
   }
   
   /**
@@ -50,7 +48,7 @@ class CustomerOrderRepository {
       val status:CustomerOrderStatus = statusRepo.getStatus(rs.getInt("idCustomerOrderStatus"))
       val cust:Customer = customerRepo.getCustomer(rs.getInt("idCustomer"))
       val employee:Employee = employeeRepo.getEmployee(rs.getInt("idEmployee"))
-      val datePlaced = dateConverter.convertDateToLocalDate(rs.getDate("datePlaced"))
+      val datePlaced = dateConverter.convertSQLDateToLocalDate(rs.getDate("datePlaced"))
       val dateShipped = getDateShipped(rs)
       
       new CustomerOrder(rs.getInt("idCustomerOrder"), datePlaced, dateShipped, rs.getBoolean("isPaid"), addr, status, employee, cust)
@@ -63,7 +61,7 @@ class CustomerOrderRepository {
   private def getDateShipped(rs:ResultSet):Option[LocalDate] = {
     rs.getDate("dateShipped")
       if(!rs.wasNull()) {
-        Some(dateConverter.convertDateToLocalDate(rs.getDate("dateShipped")))
+        Some(dateConverter.convertSQLDateToLocalDate(rs.getDate("dateShipped")))
       } else {
         None
       }
