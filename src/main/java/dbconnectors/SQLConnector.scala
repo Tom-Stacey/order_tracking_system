@@ -6,6 +6,7 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet
 import java.sql.PreparedStatement
+import helpers.DateTimeConverter
 
 /**
  * @author tstacey
@@ -15,6 +16,8 @@ class SQLConnector {
     val url = "jdbc:mysql://localhost/mydb"
     val username = "root"
     val password = "netbuilder"
+    
+    val dateConverter = new DateTimeConverter()
     
     var connection:Connection = null
     
@@ -81,6 +84,8 @@ class SQLConnector {
         case "string" => addString(pStatement, index.+(1), variables(index)(1))
         case "int" => addInt(pStatement, index.+(1), variables(index)(1))
         case "double" => addDouble(pStatement, index.+(1), variables(index)(1))
+        case "date" => addDate(pStatement, index.+(1), variables(index)(1))
+        case "boolean" => addBoolean(pStatement, index.+(1), variables(index)(1))
       }
       if(index < variables.length.-(1)) {
         addVariablesToPreparedStatement(index.+(1),pStatement,variables)
@@ -91,21 +96,55 @@ class SQLConnector {
      * adds a String to the passed prepared statement at the passed index
      */
     private def addString(pStatement:PreparedStatement, index:Int, value:String) {
-      pStatement.setString(index, value)
+      if(value == "null") {
+        pStatement.setNull(index, java.sql.Types.INTEGER)
+      } else {
+        pStatement.setString(index, value)
+      }
     }
     
     /**
      * adds an Int to the passed prepared statement at the passed index
      */
     private def addInt(pStatement:PreparedStatement, index:Int, value:String) {
-      pStatement.setInt(index, value.toInt)
+      if(value == "null") {
+        pStatement.setNull(index, java.sql.Types.INTEGER)
+      } else {
+        pStatement.setInt(index, value.toInt)
+      }
     }
     
     /**
      * adds a Double to the passed prepared statement at the passed index
      */
     private def addDouble(pStatement:PreparedStatement, index:Int, value:String) {
-      pStatement.setDouble(index, value.toDouble)
+      if(value == "null") {
+        pStatement.setNull(index, java.sql.Types.DOUBLE)
+      } else {
+        pStatement.setDouble(index, value.toDouble)
+      }
+    }
+    
+    /**
+     * adds a Date to the passed prepared statement at the passed index
+     */
+    private def addDate(pStatement:PreparedStatement, index:Int, value:String) {
+      if(value == "null") {
+        pStatement.setNull(index, java.sql.Types.DATE)
+      } else {
+        pStatement.setDate(index, dateConverter.convertDateStringToSQLDate(value))
+      }
+    }
+    
+    /**
+     * adds a Boolean to the passed prepared statement at the passed index
+     */
+    private def addBoolean(pStatement:PreparedStatement, index:Int, value:String) {
+      if(value == "null") {
+        pStatement.setNull(index, java.sql.Types.BOOLEAN)
+      } else {
+        pStatement.setBoolean(index, value.toBoolean)
+      }
     }
     
 }

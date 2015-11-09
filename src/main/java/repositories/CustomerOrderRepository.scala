@@ -9,6 +9,7 @@ import entities.Employee
 import helpers.DateTimeConverter
 import entities.CustomerOrder
 import java.time.LocalDate
+import java.sql.Date
 
 
 /**
@@ -27,22 +28,115 @@ class CustomerOrderRepository {
    */
   def getCustomerOrder(customerOrderID:Int): CustomerOrder = {
     val sql:String = "SELECT idCustomerOrder, datePlaced, dateShipped, isPaid, idAddress, idCustomerOrderStatus, idEmployee, idCustomer "+
-                  "FROM customerorder WHERE idCustomerOrder = ?"
+                  " FROM customerorder WHERE idCustomerOrder = ?"
     val vars:Array[Array[String]] = Array(Array("Int",customerOrderID.toString()))
     connector.connect()
     try {
       val rs:ResultSet = connector.doPreparedQuery(sql, vars)
       rs.next()
-      createCustomerOrderFromResultSet(rs)
+      createCustomerOrderFromResultSetRow(rs)
     } finally {
       connector.disconnect()
     }
   }
   
   /**
+   * returns a list of CustomerOrder Entities that have the passed statusID
+   */
+  def getCustomerOrdersByStatusID(statusID:Int):List[CustomerOrder] = {
+    val sql:String = "SELECT idCustomerOrder, datePlaced, dateShipped, isPaid, idAddress, idCustomerOrderStatus, idEmployee, idCustomer "+
+                  " FROM customerorder WHERE idCustomerOrderStatus = ?"
+    val vars:Array[Array[String]] = Array(Array("Int",statusID.toString()))
+    try {
+      val rs:ResultSet = connector.doPreparedQuery(sql, vars)
+      createCustomerOrdersFromResultSet(rs)
+    } finally {
+      connector.disconnect()
+    }
+  }
+  
+  /**
+   * returns a list of CustomerOrder Entities corresponding to the passed CustomerOrderStatus
+   */
+  def getCustomerOrdersByStatusID(status:CustomerOrderStatus):List[CustomerOrder] = {
+    getCustomerOrdersByStatusID(status.statusID)
+  }
+  
+  /**
+   * returns a list of CustomerOrder Entities that have the passed statusID
+   */
+  def getCustomerOrdersByEmployeeID(employeeID:Int):List[CustomerOrder] = {
+    val sql:String = "SELECT idCustomerOrder, datePlaced, dateShipped, isPaid, idAddress, idCustomerOrderStatus, idEmployee, idCustomer "+
+                  " FROM customerorder WHERE idCustomerEmployee = ?"
+    val vars:Array[Array[String]] = Array(Array("Int",employeeID.toString()))
+    try {
+      val rs:ResultSet = connector.doPreparedQuery(sql, vars)
+      createCustomerOrdersFromResultSet(rs)
+    } finally {
+      connector.disconnect()
+    }
+  }
+  
+  /**
+   * returns a list of CustomerOrder Entities that belong to the passed Employee
+   */
+  def getCustomerOrdersByEmployeeID(employee:Employee):List[CustomerOrder] = {
+    getCustomerOrdersByEmployeeID(employee.employeeUser.idUser)
+  }
+  
+  def updateCustomerOrder(customerOrder:CustomerOrder) {
+    val sql:String = "UPDATE customerorder SET "+
+                    " datePlaced = ?, dateShipped = ?, isPaid = ?, idAddress = ?, idCustomerOrderStatus = ?, idEmployee = ?, idCustomer = ?"+
+                  " WHERE idCustomerOrder = ?"
+    
+    val vars:Array[Array[String]] = Array(
+                                        Array("Date",customerOrder.datePlaced.toString),
+                                        Array("Date",getSQLDateStringFromOption(customerOrder.dateShipped) ),
+                                        Array("Boolean",customerOrder.isPaid.toString),
+                                        Array("Int",customerOrder.shippingAddress.addressID.toString),
+                                        Array("Int",customerOrder.orderStatus.statusID.toString),
+                                        Array("Int",customerOrder.orderEmployee.employeeUser.idUser.toString),
+                                        Array("Int",customerOrder.orderCustomer.customerUser.idUser.toString),
+                                        Array("Int",customerOrder.idCustomerOrder.toString)
+                                      )
+    connector.connect()
+    try {
+      connector.doPreparedUpdate(sql, vars)
+    } finally {
+      connector.disconnect()
+    }
+  }
+  
+  private def getSQLDateStringFromOption(d:Option[LocalDate]) = {
+    if(d.isEmpty) {
+      "null"
+    } else {
+      d.get.toString
+    }
+  }
+  
+  /**
+   * returns a List of CustomerOrder Entities from all customer orders in a ResultSet
+   */
+  private def createCustomerOrdersFromResultSet(rs:ResultSet):List[CustomerOrder] = {
+    
+    def listLoop(lst:List[CustomerOrder]):List[CustomerOrder] = {
+      if(rs.next()) {
+        val custOrd = createCustomerOrderFromResultSetRow(rs)
+        listLoop(lst :+ custOrd)
+      } else {
+        lst
+      }
+    }
+    
+    listLoop(List.empty)
+  }
+  
+  
+  /**
    * returns a single CustomerOrder entity from the passed ResultSet at the ResultSet's current line
    */
-  private def createCustomerOrderFromResultSet(rs:ResultSet): CustomerOrder = {
+  private def createCustomerOrderFromResultSetRow(rs:ResultSet): CustomerOrder = {
     
       val addr:Address = addressRepo.getAddress(rs.getInt("idAddress"))
       val status:CustomerOrderStatus = statusRepo.getStatus(rs.getInt("idCustomerOrderStatus"))
@@ -73,6 +167,16 @@ object custOrdRepoTest {
   
   def main(args: Array[String]): Unit = {
     val cO:CustomerOrderRepository = new CustomerOrderRepository()
-    cO.getCustomerOrder(1).print()
+    val originalOrder:CustomerOrder = cO.getCustomerOrder(1)
+    println("------------------ORIGINAL ORDER----------------------------")
+    originalOrder.print()
+    val newOrder = originalOrder.copy(isPaid = true)
+    println("------------------NEW ORDER----------------------------")
+    newOrder.print()
+    cO.updateCustomerOrder(newOrder)
+    val updatedOrder = cO.getCustomerOrder(1)
+    println("------------------UPDATED ORDER----------------------------")
+    updatedOrder.print()
+    
   }
 }
