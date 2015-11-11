@@ -6,6 +6,7 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet
 import java.sql.PreparedStatement
+import java.sql.CallableStatement
 import helpers.DateTimeConverter
 
 /**
@@ -91,6 +92,30 @@ class SQLConnector {
         addVariablesToPreparedStatement(index.+(1),pStatement,variables)
       }
     }
+    
+    def doPreparedCallUpdate(sql:String, variables:Array[Array[String]]):Unit = {
+      val cs:CallableStatement = connection.prepareCall(sql);
+      addVariablesToCallableStatement(0,cs,variables)
+      cs.executeUpdate()
+    }
+    
+     
+    /**
+     * recursive function to move through all variable pairs in the passed array and assign them to the passed statement
+     */
+    private def addVariablesToCallableStatement(index:Int, cStatement:CallableStatement, variables:Array[Array[String]]):Unit = {
+      variables(index)(0).toLowerCase() match {
+        case "string" => addString(cStatement, index.+(1), variables(index)(1))
+        case "int" => addInt(cStatement, index.+(1), variables(index)(1))
+        case "double" => addDouble(cStatement, index.+(1), variables(index)(1))
+        case "date" => addDate(cStatement, index.+(1), variables(index)(1))
+        case "boolean" => addBoolean(cStatement, index.+(1), variables(index)(1))
+      }
+      if(index < variables.length.-(1)) {
+        addVariablesToPreparedStatement(index.+(1),cStatement,variables)
+      }
+    }
+    
     
     /**
      * adds a String to the passed prepared statement at the passed index

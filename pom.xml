@@ -27,7 +27,6 @@
 			<artifactId>casbah-core_2.11</artifactId>
 			<version>3.0.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>casbah-commons_2.11</artifactId>

@@ -4,6 +4,9 @@ package entities
  * @author tstacey
  */
 case class Item(itemID:Int, itemName:String, itemDescription:String, itemVolume:Int, imageLocation:String, idSupplier:Int, itemAttributes:Map[String,String]) {
+  
+  
+  
   def print() {
     println("Item ID: "+itemID)
     println("Name: "+itemName)
