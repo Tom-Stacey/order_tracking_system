@@ -170,7 +170,7 @@ object custOrdRepoTest {
     val originalOrder:CustomerOrder = cO.getCustomerOrder(1)
     println("------------------ORIGINAL ORDER----------------------------")
     originalOrder.print()
-    val newOrder = originalOrder.copy(isPaid = true)
+    val newOrder = originalOrder.copy(isPaid = false)
     println("------------------NEW ORDER----------------------------")
     newOrder.print()
     cO.updateCustomerOrder(newOrder)
