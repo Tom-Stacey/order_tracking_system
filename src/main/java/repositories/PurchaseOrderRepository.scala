@@ -71,7 +71,7 @@ class PurchaseOrderRepository {
   
   
   /**
-   * returns a List of PurchaseORder Entities from all purchase orders in a ResultSet
+   * returns a List of PurchaseOrder Entities from all purchase orders in a ResultSet
    */
   private def createPurchaseOrdersFromResultSet(rs:ResultSet):List[PurchaseOrder] = {
     
@@ -85,6 +85,20 @@ class PurchaseOrderRepository {
     }
     
     listLoop(List.empty)
+  }
+  
+  def setStatus(purchaseOrderStatus:Int, idPurchaseOrder:Int) {
+    val sql = "UPDATE purchaseorder set idPurchaseOrderStatus = ? WHERE idPurchaseOrder = ? "
+    val vars:Array[Array[String]] = Array(
+                                          Array("Int",purchaseOrderStatus.toString()),
+                                          Array("Int",idPurchaseOrder.toString())
+                                         )
+    connector.connect()
+    try {
+      connector.doPreparedUpdate(sql, vars)
+    } finally {
+      connector.disconnect()
+    }
   }
   
   

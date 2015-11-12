@@ -7,4 +7,7 @@ case class StockEntry(item:Item, location:Location, quantity:Int, quantityClaime
   def print() {
     println("ItemID: "+item.itemID+", locationID: "+location.idLocation+", quantity: "+quantity+", quantityClaimed: "+quantityClaimed)
   }
+  def printForDemo() {
+    println("Location: "+location.locationName+", Quantity: "+quantity+", Number Claimed: "+quantityClaimed+", Number Available: "+quantity.-(quantityClaimed))
+  }
 }

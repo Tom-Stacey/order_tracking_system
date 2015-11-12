@@ -48,6 +48,38 @@ class PurchaseOrderLineRepository {
   }
   
   /**
+   * updates the purchaseOrderLine table to mark the corresponding row for the passed PurchaseOrderLine as Stored
+   */
+  private def setPurchaseOrderLineAsStored(orderLine:PurchaseOrderLine) {
+    val sql = "UPDATE purchaseorderline SET stored = 1, quantityDamaged = ? WHERE idpurchaseorder = ? and idItem = ? "
+    val vars:Array[Array[String]] = Array(
+                                        Array("Int",orderLine.quantityDamaged.getOrElse(0).toString()),
+                                        Array("Int",orderLine.purchaseOrder.idPurchaseOrder.toString()),
+                                        Array("Int",orderLine.item.itemID.toString())
+                                         )
+    connector.doPreparedUpdate(sql, vars)
+  }
+  
+  /**
+   * updates the stock levels and location space used for storing the passed PurchaseOrderLine at the passed Location
+   */
+  private def updateStockLevelsForPurchaseOrderLine(orderLine:PurchaseOrderLine, loc:Location) {
+    val numberToStore = orderLine.getUndamagedItems()
+    addOrderLineToStock(orderLine, numberToStore, loc)
+  }
+  
+  private def addOrderLineToStock(orderLine:PurchaseOrderLine, numberToStore:Int, loc:Location) {
+    val callSQL = "{call add_or_update_stock(?, ?, ?)}"
+    val vars:Array[Array[String]] = Array(
+                                        Array("Int",orderLine.item.itemID.toString()),
+                                        Array("Int",numberToStore.toString()),
+                                        Array("Int",loc.idLocation.toString())
+                                        )
+    
+      connector.doPreparedCallUpdate(callSQL, vars)
+  }
+  
+  /**
    * returns a single Purchase Order Line using the passed item ID and Purchase Order ID
    */
   def getPurchaseOrderLine(itemID:Int, purchaseOrderID:Int):PurchaseOrderLine = {
@@ -100,36 +132,21 @@ class PurchaseOrderLineRepository {
   
   
   /**
-   * updates the purchaseOrderLine table to mark the corresponding row for the passed PurchaseOrderLine as Stored
+   * retrieves all Purchase order lines from the SQL database and returns them as a list of PurchaseOrderLine entities
    */
-  private def setPurchaseOrderLineAsStored(orderLine:PurchaseOrderLine) {
-    val sql = "UPDATE purchaseorderline SET stored = 1, quantityDamaged = ? WHERE idpurchaseorder = ? and idItem = ? "
-    val vars:Array[Array[String]] = Array(
-                                        Array("Int",orderLine.quantityDamaged.getOrElse(0).toString()),
-                                        Array("Int",orderLine.purchaseOrder.idPurchaseOrder.toString()),
-                                        Array("Int",orderLine.item.itemID.toString())
-                                         )
-    connector.doPreparedUpdate(sql, vars)
+  private def getAllPurchaseOrderLines(purchOrd:PurchaseOrder): List[PurchaseOrderLine] = {
+    val sql:String = "SELECT idItem, quantity, quantityDamaged, stored FROM PurchaseOrderline WHERE idPurchaseOrder = ? ORDER BY idItem"
+    val vars:Array[Array[String]] = Array(Array("Int",purchOrd.idPurchaseOrder.toString()))
+    connector.connect()
+    try {
+      val rs:ResultSet = connector.doPreparedQuery(sql, vars)
+      createPurchaseOrderLinesFromResultSet(rs, purchOrd)
+    } finally {
+      connector.disconnect()
+    }
   }
   
-  /**
-   * updates the stock levels and location space used for storing the passed PurchaseOrderLine at the passed Location
-   */
-  private def updateStockLevelsForPurchaseOrderLine(orderLine:PurchaseOrderLine, loc:Location) {
-    val numberToStore = orderLine.getUndamagedItems()
-    addOrderLineToStock(orderLine, numberToStore, loc)
-  }
   
-  private def addOrderLineToStock(orderLine:PurchaseOrderLine, numberToStore:Int, loc:Location) {
-    val callSQL = "{call add_or_update_stock(?, ?, ?)}"
-    val vars:Array[Array[String]] = Array(
-                                        Array("Int",orderLine.item.itemID.toString()),
-                                        Array("Int",numberToStore.toString()),
-                                        Array("Int",loc.idLocation.toString())
-                                        )
-    
-      connector.doPreparedCallUpdate(callSQL, vars)
-  }
   
   /**
    * updates the location table in SQL database to reflect the volume stored there corresponding to the passed purchase order line
@@ -145,21 +162,6 @@ class PurchaseOrderLineRepository {
       connector.doPreparedCallUpdate(callSQL, vars)
   }
   
-  
-  /**
-   * retrieves all Purchase order lines from the SQL database and returns them as a list of PurchaseOrderLine entities
-   */
-  private def getAllPurchaseOrderLines(purchOrd:PurchaseOrder): List[PurchaseOrderLine] = {
-    val sql:String = "SELECT idItem, quantity, quantityDamaged, stored FROM PurchaseOrderline WHERE idPurchaseOrder = ? ORDER BY idItem"
-    val vars:Array[Array[String]] = Array(Array("Int",purchOrd.idPurchaseOrder.toString()))
-    connector.connect()
-    try {
-      val rs:ResultSet = connector.doPreparedQuery(sql, vars)
-      createPurchaseOrderLinesFromResultSet(rs, purchOrd)
-    } finally {
-      connector.disconnect()
-    }
-  }
   
   /**
    * creates PurchaseOrderLine entities from the passed ResultSet and returns them as a List

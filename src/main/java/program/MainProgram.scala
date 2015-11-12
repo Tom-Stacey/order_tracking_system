@@ -8,16 +8,17 @@ import entities._
  */
 object MainProgram {
   
-  var whichScreen:String = "login"
   val OPTIONS_IN_MAIN = 4
-  val OPTIONS_IN_PURCHASE_ORDER_SUMMARY = 2
+  val OPTIONS_IN_PURCHASE_ORDER_SUMMARY = 3
   val OPTIONS_IN_INDIVIDUAL_PURCHASE_ORDER = 1
   
   
   val custOrderRepo = new CustomerOrderRepository()
   val purchaseOrderRepo = new PurchaseOrderRepository()
   val purchaseOrderLineRepo = new PurchaseOrderLineRepository()
+  val purchaseOrderStatusRepo = new PurchaseOrderStatusRepository()
   val stockTotalsRepo = new StockTotalsEntryRepository()
+  val stockRepo = new StockEntryRepository()
   val locationsRepo = new LocationRepository()
   val userRepo = new UserRepository()
   
@@ -27,9 +28,6 @@ object MainProgram {
   def main(args: Array[String]): Unit = {
     
     runLogin()
-    for (ln <- io.Source.stdin.getLines) {
-      interpretInstruction(ln);
-    }
   }
   
   private def readLine():String = {
@@ -48,7 +46,6 @@ object MainProgram {
   
   private def runOpeningScreen() {
     println("Welcome to warehouse order tracking system. Please select an option: ")
-    println("0: Return to main menu")
     println("1: View all customer orders")
     println("2: View all purchase orders")
     println("3: View stock levels")
@@ -57,15 +54,6 @@ object MainProgram {
     
   }
   
-  private def interpretInstruction(input:String) {
-    whichScreen match {
-      case "login" => interpretLogin(input)
-      case "main" => interpretMain(input)
-      case "showPurchaseOrders" => interpretPurchaseOrderSummary(input)
-      case "showIndividualPurchaseOrder" => interpretPurchaseOrderLineRequest(input)
-      case "receivePurchaseOrder" => receivePurchaseOrder(input)
-    }
-  }
   
   private def interpretLogin(input:String) {
     println("Please enter your password")
@@ -89,7 +77,6 @@ object MainProgram {
   }
   
   private def login() {
-    whichScreen = "main"
     runOpeningScreen()
   }
   
@@ -111,11 +98,12 @@ object MainProgram {
       }
     } else {
       println("Please enter a number between 0 and "+OPTIONS_IN_MAIN)
+      interpretMain(readLine())
     }
   }
   
   private def checkForNumberInput(input:String):Boolean = {
-    if(!input.forall { Character.isDigit }) {
+    if(!input.forall { Character.isDigit } || input == "") {
       false
     } else {
       true
@@ -123,7 +111,7 @@ object MainProgram {
   }
   
   private def checkForNumberInput(input:String, numberOfOptions:Int):Boolean = {
-    if(!input.forall { Character.isDigit }) {
+    if(!input.forall { Character.isDigit } || input == "") {
       false
     } else {
       if(input.toInt > numberOfOptions || input.toInt < 0) {
@@ -148,6 +136,7 @@ object MainProgram {
   private def showPurchaseOrderOptions() {
     println("1: View individual Purchase Order details")
     println("2: Process the receipt of a Purchase Order")
+    println("3: Update the status of a Purchase Order")
     println("0: Return to main menu")
   }
   
@@ -157,9 +146,34 @@ object MainProgram {
         case 0 => runOpeningScreen()
         case 1 => showIndividualPurchaseOrder()
         case 2 => processPurchaseOrder()
+        case 3 => updatePurchaseOrderStatus()
       }
     } else {
       println("Please enter a number between 0 and "+OPTIONS_IN_PURCHASE_ORDER_SUMMARY)
+      interpretPurchaseOrderSummary(readLine())
+    }
+  }
+  
+  private def updatePurchaseOrderStatus() {
+    println("Enter the ID of the Purchase Order you wish to update")
+    updatePurchaseOrderStatus(readLine())
+  }
+  
+  private def updatePurchaseOrderStatus(input:String) {
+    if(!checkForNumberInput(input) || !purchaseOrderRepo.checkForValidOrderID(input.toInt)) {
+      println("Please enter a valid Purchase Order ID: ")
+      updatePurchaseOrderStatus(readLine())
+    } else {
+      val purchaseOrder = purchaseOrderRepo.getPurchaseOrder(input.toInt)
+      purchaseOrder.printForDemo()
+      println("Enter the desired statusID from the list below, or 0 to return to the main menu")
+      for((k,v) <- purchaseOrderStatusRepo.statuses) {
+        println("ID: "+k+", Status: "+v.status)
+      }
+      val statusVal = readLine()
+      purchaseOrderRepo.setStatus(statusVal.toInt, purchaseOrder.idPurchaseOrder)
+      println("Status Updated")
+      showAllPurchaseOrders()
     }
   }
   
@@ -176,12 +190,15 @@ object MainProgram {
       val purchaseOrder = purchaseOrderRepo.getPurchaseOrder(purchaseOrderID.toInt)
       val purchOrderLines:List[PurchaseOrderLine] = purchaseOrderLineRepo.getPurchaseOrderLines(purchaseOrderID.toInt)
       displayPurchaseOrderLines(purchOrderLines)
-      println("Enter the order Item ID you wish to store")
+      println("Enter the order Item ID you wish to store, or type 'return' to return to the order summary page")
       receivePurchaseOrderLine(readLine(), purchOrderLines, purchaseOrder)
     }
   }
   
   private def receivePurchaseOrderLine(input:String, purchOrderLines:List[PurchaseOrderLine], purchaseOrder:PurchaseOrder) {
+    if(input == "return") {
+      showAllPurchaseOrders()
+    }
     if(!checkForNumberInput(input) || !linesContainItem(input.toInt, purchOrderLines)) {
       println("Item is not in this purchase order. Please enter a valid item ID")
       receivePurchaseOrderLine(readLine(), purchOrderLines, purchaseOrder)
@@ -265,6 +282,9 @@ object MainProgram {
     for(custOrd <- custOrders) {
      custOrd.printForDemo(); println()
     }
+    println("Press Enter to return to main menu")
+    readLine()
+    runOpeningScreen()
   }
   
   private def showStockLevels() {
@@ -272,6 +292,54 @@ object MainProgram {
     for(stockLine <- stockLines) {
       stockLine.printForDemo()
     }
+    showStockMenu(stockLines)
+    
+  }
+  
+  private def showStockMenu(stockLines:List[StockTotalsEntry]) {
+    println("Enter an Item ID to see a location breakdown for that item, or 0 to return to the main menu")
+    showStockForItem(readLine(), stockLines)
+  }
+  
+  private def showStockForItem(input:String, stockLines:List[StockTotalsEntry]) {
+    if(input == "0") {
+      runOpeningScreen()
+    } else {
+      if(!checkForNumberInput(input) || !itemInStockLines(input.toInt, stockLines)) {
+        println("Invalid item ID")
+        showStockMenu(stockLines)
+      } else {
+        showStockLinesForItem(input.toInt)
+      }
+    }
+  }
+  
+  private def itemInStockLines(itemID:Int, stockLines:List[StockTotalsEntry]):Boolean = {
+    
+    def listCheck(stockList:List[StockTotalsEntry]):Boolean = {
+      if(stockList.isEmpty) {
+        false
+      } else {
+        if(stockList.head.item.itemID == itemID) {
+          true
+        } else {
+          listCheck(stockList.tail)
+        }
+      }
+    }
+    
+    listCheck(stockLines)
+  }
+  
+  private def showStockLinesForItem(itemID:Int) {
+    val stockList:List[StockEntry] = stockRepo.getAllEntriesForItem(itemID)
+    for(s <- stockList) {
+      s.printForDemo()
+    }
+    println()
+    println("Press Enter to return to stock totals screen")
+    readLine()
+    showStockLevels()
   }
   
   private def showLocationDetails() {
@@ -279,6 +347,9 @@ object MainProgram {
     for(loc <- locs) {
       loc.printForDemo()
     }
+    println("Press Enter to return to main menu")
+    readLine()
+    runOpeningScreen()
   }
   
   
