@@ -24,4 +24,11 @@ case class PurchaseOrder(idPurchaseOrder:Int,
     employee.print()
   }
   
+  def printForDemo() {
+    println(" ID: "+idPurchaseOrder)
+    println("   Date Placed: "+datePlaced+", Date Expected: "+dateExpected.getOrElse("None")+", Supplier ID: "+supplier.idSupplier)
+    println("   Status: "+purchaseOrderStatus.status+", Employee ID: "+employee.employeeUser.idUser)
+  }
+  
+  
 }

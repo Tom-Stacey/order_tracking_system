@@ -7,6 +7,8 @@ import repositories.LocationRepository
 import entities.Item
 import scala.collection.immutable.SortedMap
 import repositories.CustomerOrderLineRepository
+import repositories.LocationRepository
+import repositories.CustomerOrderLineRepository
 
 
 /**
@@ -24,8 +26,8 @@ class TravellingSalesman {
   def testy() {
     val cOrd = new CustomerOrderLineRepository()
     val lines = cOrd.getCustomerOrderLines(1)
-    val possLocs:List[LocItems] = getLocItemsFromCustomerOrderLines(lines)
-    for(x <- possLocs) {
+    val locList = getLocItemsFromCustomerOrderLines(lines)
+    for(x <- locList) {
       println(x)
     }
   }
@@ -37,86 +39,52 @@ class TravellingSalesman {
    */
   private def getLocItemsFromCustomerOrderLines(orderLinesList:List[CustomerOrderLine]):List[LocItems] = {
     
-    def locItemsListLoop(lst:List[LocItems], orderLines:List[CustomerOrderLine]):List[LocItems] = {
-      val custOrd:CustomerOrderLine = orderLines.head
-      val itemLocs:List[Location] = locRepo.getAllPossibleLocationsForItem(custOrd.item, custOrd.quantity)
-      val lst2:List[LocItems] = editLocItemsListWithNewLocs(lst, itemLocs, custOrd.item.itemID)
-      if(orderLines.tail.nonEmpty) {
-        locItemsListLoop(lst2,orderLines.tail)
-      } else {
-        lst2
+    var locItemsList:List[LocItems] = List.empty 
+    
+    for(custOrdLine:CustomerOrderLine <- orderLinesList) {
+      println("here")
+      val itemLocs:List[Location] = locRepo.getAllPossibleLocationsForItem(custOrdLine.item, custOrdLine.quantity)
+      println(itemLocs)
+      for(loc:Location <- itemLocs) {
+        if(checkForLocationInLocItemsList(loc, locItemsList)) {
+          val locItemsIndex = getIndexOfLocationInLocItems(loc, locItemsList)
+          locItemsList = locItemsList.updated(locItemsIndex, locItemsList.apply(locItemsIndex).addItem(custOrdLine.item.itemID))
+        } else {
+          locItemsList = locItemsList :+ new LocItems(loc, List(custOrdLine.item.itemID))
+        }
       }
     }
-    
-    locItemsListLoop(List.empty, orderLinesList)
-    
-    
+    locItemsList
   }
   
-  /**
-   * edits the passed list of LocItems to include the locations of the passed item. Returns new List of LocItems including the original List
-   */
-  private def editLocItemsListWithNewLocs(lst:List[LocItems], newItemLocs:List[Location], itemID:Int):List[LocItems] = {
-    
-    def lstLoop(lst:List[LocItems], newItemLocs:List[Location]):List[LocItems] = {
-      val loc:Location = newItemLocs.head
-      if(!checkForLocationInLocItemsList(loc, lst)) {
-        val locItem = new LocItems(loc, List(itemID))
-        if(!newItemLocs.tail.isEmpty) {
-          lstLoop(lst :+ locItem, newItemLocs.tail)
-        } else {
-          lst :+ locItem
-        }
-      } else {
-        val lst2 = addItemToLocationInLocItemsList(loc, lst, itemID)
-        lst2
+  private def getIndexOfLocationInLocItems(loc:Location, locItemsList:List[LocItems]):Int = {
+    println("In getIndex")
+    for(locItems <- locItemsList) {
+      Thread.sleep(1000)
+      if(locItems.loc == loc) {
+        println("Yay")
+        locItemsList.indexOf(locItems)
       }
     }
-    
-    lstLoop(lst,List.empty)
-    
-  }
-  
-  /**
-   * returns a copy of the LocItems List with the passed itemID added in the correct location
-   */
-  private def addItemToLocationInLocItemsList(loc:Location, lst:List[LocItems], itemID:Int):List[LocItems] = {
-    
-    def sortOutLocItems(lst:List[LocItems], retList:List[LocItems]):List[LocItems] = {
-      val locItem:LocItems = lst.head
-      if(locItem.contains(itemID)) {
-        val updatedLocItems = locItem.addItem(itemID)
-        if(!lst.tail.isEmpty) {
-          sortOutLocItems(lst.tail, retList :+ updatedLocItems)
-        } else {
-          retList :+ updatedLocItems
-        }
-      } else {
-        if(!lst.tail.isEmpty) {
-          sortOutLocItems(lst.tail, retList :+ locItem)
-        } else {
-          retList :+ locItem
-        }
-      }
-    
-      
-    }
-    
-    sortOutLocItems(lst, List.empty)
+    throw new Error("Location not in list of LocItems in getIndexOfLocationInLocItems()")
   }
   
   /**
    * returns true if passed location is contained within passed LocItems list
    */
   private def checkForLocationInLocItemsList(loc:Location, locItems:List[LocItems]):Boolean = {
-    val locItem = locItems.head
-    if(locItem.loc == loc) {
-      true
+    if(locItems.isEmpty) {
+      false
     } else {
-      if(locItems.tail.isEmpty) {
-        false
+      val locItem = locItems.head
+      if(locItem.loc == loc) {
+        true
       } else {
-        checkForLocationInLocItemsList(loc, locItems.tail)
+        if(locItems.tail.isEmpty) {
+          false
+        } else {
+          checkForLocationInLocItemsList(loc, locItems.tail)
+        }
       }
     }
   }
@@ -126,6 +94,10 @@ class TravellingSalesman {
 object tst {
   def main(args: Array[String]): Unit = {
     val tst = new TravellingSalesman()
+//    val locRepo = new LocationRepository()
+//    val custOrdRepo = new CustomerOrderLineRepository()
+//    val orderLine = custOrdRepo.getCustomerOrderLine(1, 3)
+    //println(locRepo.getAllPossibleLocationsForItem(orderLine.item, orderLine.quantity))
     tst.testy()
   }
 }

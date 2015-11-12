@@ -1,5 +1,7 @@
 package entities
 
+import org.omg.CORBA.portable.IDLEntity
+
 /**
  * @author tstacey
  */
@@ -11,5 +13,11 @@ case class Location(idLocation:Int, locationName:String, locationLtrVolume:Int, 
     println("Volume used: "+locationLtrVolumeUsed+" ltr")
     println("Row: "+locationRow)
     println("Col: "+locationCol)
+  }
+  
+  def printForDemo() {
+    println(" Location ID: "+idLocation)
+    println("   Location Name: "+locationName+", Warehouse Row: "+locationRow+", Warehouse Column: "+locationCol)
+    println("   Total Space: "+locationLtrVolume+"ltr, Space Used: "+locationLtrVolumeUsed+"ltr, Space Available: "+locationLtrVolume.-(locationLtrVolumeUsed)+"ltr")
   }
 }

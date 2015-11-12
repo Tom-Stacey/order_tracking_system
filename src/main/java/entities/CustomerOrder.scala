@@ -33,6 +33,12 @@ case class CustomerOrder(idCustomerOrder:Int,
     
     
   }
+  
+  def printForDemo() {
+    println(" ID: "+idCustomerOrder)
+    println("   Status: "+orderStatus.status+", Date Placed: "+datePlaced+", Date Shipped: "+dateShipped.getOrElse("None")+", Paid? "+isPaid)
+    println("   Shipping Address ID: "+shippingAddress.addressID+", Employee: "+orderEmployee.employeeUser.idUser+", Customer: "+orderCustomer.customerUser.idUser)
+  }
 }
 
 object CustTest {

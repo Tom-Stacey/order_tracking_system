@@ -23,6 +23,22 @@ class CustomerOrderRepository {
   val connector = new SQLConnector()
   val dateConverter = new DateTimeConverter()
   
+  
+  /**
+   * returns a list of CustomerOrder entities from all Customer Orders in the database
+   */
+  def getAllCustomerOrders():List[CustomerOrder] = {
+    val sql:String = "SELECT idCustomerOrder, datePlaced, dateShipped, isPaid, idAddress, idCustomerOrderStatus, idEmployee, idCustomer FROM customerorder"
+    connector.connect()
+    try {
+      val rs:ResultSet = connector.doSimpleQuery(sql)
+      createCustomerOrdersFromResultSet(rs)
+    } finally {
+      connector.disconnect()
+    }
+    
+  }
+  
   /**
    * returns a CustomerOrder entity corresponding to the passed customerOrderID
    */
@@ -54,6 +70,7 @@ class CustomerOrderRepository {
       connector.disconnect()
     }
   }
+  
   
   /**
    * returns a list of CustomerOrder Entities corresponding to the passed CustomerOrderStatus

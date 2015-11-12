@@ -21,6 +21,21 @@ class PurchaseOrderRepository {
   val dateConverter = new DateTimeConverter()
   
   
+  
+  /**
+   * returns all PurchaseOrder Entities from the SQL database
+   */
+  def getAllPurchaseOrders():List[PurchaseOrder] = {
+    val sql:String = "SELECT idPurchaseOrder, datePlaced, dateExpected, idPurchaseOrderStatus, idSupplier, idEmployee FROM purchaseorder"
+    connector.connect()
+    try {
+      val rs:ResultSet = connector.doSimpleQuery(sql)
+      createPurchaseOrdersFromResultSet(rs)
+    } finally {
+      connector.disconnect()
+    }
+  }
+  
   /**
    * returns a PurchaseOrder Entity from the SQL database corresponding to the passed purchaseOrderID
    */
@@ -37,6 +52,41 @@ class PurchaseOrderRepository {
       connector.disconnect()
     }
   }
+  
+  /**
+   * returns true if the passed ID corresponds to a Purchase ORder in the SQL database
+   */
+  def checkForValidOrderID(purchaseOrderID:Int):Boolean = {
+    val sql:String = "SELECT idPurchaseOrder "+
+                  "FROM purchaseorder WHERE idPurchaseOrder = ?"
+    val vars:Array[Array[String]] = Array(Array("Int",purchaseOrderID.toString()))
+    connector.connect()
+    try {
+      val rs:ResultSet = connector.doPreparedQuery(sql, vars)
+      rs.next()
+    } finally {
+      connector.disconnect()
+    }
+  }
+  
+  
+  /**
+   * returns a List of PurchaseORder Entities from all purchase orders in a ResultSet
+   */
+  private def createPurchaseOrdersFromResultSet(rs:ResultSet):List[PurchaseOrder] = {
+    
+    def listLoop(lst:List[PurchaseOrder]):List[PurchaseOrder] = {
+      if(rs.next()) {
+        val custOrd = createPurchaseOrderFromResultSetRow(rs)
+        listLoop(lst :+ custOrd)
+      } else {
+        lst
+      }
+    }
+    
+    listLoop(List.empty)
+  }
+  
   
   /**
    * Returns a PurchaseOrder Entity populated from the current row of the passed ResultSet

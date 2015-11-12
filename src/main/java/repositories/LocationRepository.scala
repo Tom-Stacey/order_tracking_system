@@ -30,6 +30,22 @@ class LocationRepository {
     
     }
   
+  def getLocation(locationID:Int):Location = {
+    val sql:String = "SELECT idLocation, locationName, locationLtrVolume, locationLtrVolumeUsed, locationRow, locationCol FROM location WHERE idLocation = ? "
+    val vars:Array[Array[String]] = Array(
+                                          Array("Int",locationID.toString())
+                                          )
+    connector.connect()
+    try {
+      val rs:ResultSet = connector.doPreparedQuery(sql, vars)
+      rs.next()
+      createLocationFromResultSetRow(rs)
+    } finally {
+      connector.disconnect()
+    }
+  }
+  
+  
     /**
      * returns a List of Location Entities for all possible locations from where the passed quantity of the passed Item can be obtained
      */
@@ -48,6 +64,19 @@ class LocationRepository {
       }
     }
   
+    /**
+     * returns all location entities from the database as a List
+     */
+    def getAllLocationsAsList():List[Location] =  {
+      val sql:String = "SELECT idLocation, locationName, locationLtrVolume, locationLtrVolumeUsed, locationRow, locationCol FROM location ORDER BY idLocation"
+      connector.connect()
+      try {
+        val rs:ResultSet = connector.doSimpleQuery(sql)
+        createListFromResultSet(rs)
+      } finally {
+        connector.disconnect()
+      }
+    }
     
     /**
      * returns a List of Location Entities from the passed ResultSet

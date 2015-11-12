@@ -14,6 +14,11 @@ case class PurchaseOrderLine(item:Item, purchaseOrder:PurchaseOrder, quantity:In
     
   }
   
+  def printForDemo() {
+    println("Item ID: " +item.itemID+", Item Name: "+item.itemName)
+    println("Quantity Ordered: " +quantity+", Quantity Arrived Damaged: "+quantityDamaged.getOrElse("Not Recorded")+", Stored: "+stored)
+  }
+  
   /**
    * returns the number of non-damaged items in a PurchaseOrderLine 
    */

@@ -48,11 +48,64 @@ class PurchaseOrderLineRepository {
   }
   
   /**
+   * returns a single Purchase Order Line using the passed item ID and Purchase Order ID
+   */
+  def getPurchaseOrderLine(itemID:Int, purchaseOrderID:Int):PurchaseOrderLine = {
+    val sql:String = "SELECT idPurchaseOrder, idItem, quantity, quantityDamaged, stored FROM PurchaseOrderline WHERE idPurchaseOrder = ? AND idItem = ?"
+    val vars:Array[Array[String]] = Array(
+                                          Array("Int",purchaseOrderID.toString()),
+                                          Array("Int",itemID.toString())
+                                         )
+    connector.connect()
+    try {
+      val rs:ResultSet = connector.doPreparedQuery(sql, vars)
+      rs.next()
+      createOrderLineFromResultSetRow(rs)
+    } finally {
+      connector.disconnect()
+    }
+  }
+  
+  /**
+   * returns a single Purchase ORder Entity from the current row of the passed ResultSet
+   */
+  private def createOrderLineFromResultSetRow(rs:ResultSet):PurchaseOrderLine = {
+    val purchOrd = orderRepo.getPurchaseOrder(rs.getInt("idPurchaseOrder"))
+    val itm:Item = itemRepo.getItem(rs.getInt("idItem"))
+    val quantity = rs.getInt("quantity")
+    val quantityDamaged = getQuantityDamaged(rs)
+    val stored = rs.getBoolean("stored")
+    new PurchaseOrderLine(itm,purchOrd,quantity, quantityDamaged, stored)
+  }
+  
+  
+  /**
+   * returns true if the passed purchase order line ID has a corresponding Item ID
+   */
+  def checkForItemInOrderLine(idPurchaseOrder:Int, idItem:Int):Boolean = {
+    
+    val sql:String = "SELECT idPurchaseOrder FROM PurchaseOrderline WHERE idPurchaseOrder = ? AND idItem = ?"
+    val vars:Array[Array[String]] = Array(
+                                          Array("Int",idPurchaseOrder.toString()),
+                                          Array("Int",idItem.toString())
+                                         )
+    connector.connect()
+    try {
+      val rs:ResultSet = connector.doPreparedQuery(sql, vars)
+      rs.next()
+    } finally {
+      connector.disconnect()
+    }
+  }
+  
+  
+  /**
    * updates the purchaseOrderLine table to mark the corresponding row for the passed PurchaseOrderLine as Stored
    */
   private def setPurchaseOrderLineAsStored(orderLine:PurchaseOrderLine) {
-    val sql = "UPDATE purchaseorderline SET stored = 1 WHERE idpurchaseorder = ? and idItem = ? "
+    val sql = "UPDATE purchaseorderline SET stored = 1, quantityDamaged = ? WHERE idpurchaseorder = ? and idItem = ? "
     val vars:Array[Array[String]] = Array(
+                                        Array("Int",orderLine.quantityDamaged.getOrElse(0).toString()),
                                         Array("Int",orderLine.purchaseOrder.idPurchaseOrder.toString()),
                                         Array("Int",orderLine.item.itemID.toString())
                                          )
@@ -70,7 +123,7 @@ class PurchaseOrderLineRepository {
   private def addOrderLineToStock(orderLine:PurchaseOrderLine, numberToStore:Int, loc:Location) {
     val callSQL = "{call add_or_update_stock(?, ?, ?)}"
     val vars:Array[Array[String]] = Array(
-                                        Array("Int",orderLine.purchaseOrder.idPurchaseOrder.toString()),
+                                        Array("Int",orderLine.item.itemID.toString()),
                                         Array("Int",numberToStore.toString()),
                                         Array("Int",loc.idLocation.toString())
                                         )
