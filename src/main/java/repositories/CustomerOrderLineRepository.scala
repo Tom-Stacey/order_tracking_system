@@ -66,6 +66,21 @@ class CustomerOrderLineRepository {
   }
   
   /**
+   * returns a list of the item IDs from each of the CustomerOrderLine Entities in the passed List
+   */
+  def getListOfItemIDsFromCustomerOrderLines(lines:List[CustomerOrderLine]):List[Int] = {
+    def loop(inList:List[CustomerOrderLine], outList:List[Int]):List[Int] = {
+      if(inList.isEmpty) {
+        outList
+      } else {
+        loop(inList.tail, outList :+ inList.head.item.itemID)
+      }
+    }
+    
+    loop(lines,List.empty)
+  }
+  
+  /**
    * Updates the SQL database to mark the passed customer order line as picked and updates the stock levels at the passed location to match
    * Returns a copy of the passed CustomerOrderLine with the picked boolean set to true
    */

@@ -39,54 +39,24 @@ class TravellingSalesman {
    */
   private def getLocItemsFromCustomerOrderLines(orderLinesList:List[CustomerOrderLine]):List[LocItems] = {
     
-    var locItemsList:List[LocItems] = List.empty 
-    
-    for(custOrdLine:CustomerOrderLine <- orderLinesList) {
-      println("here")
-      val itemLocs:List[Location] = locRepo.getAllPossibleLocationsForItem(custOrdLine.item, custOrdLine.quantity)
-      println(itemLocs)
-      for(loc:Location <- itemLocs) {
-        if(checkForLocationInLocItemsList(loc, locItemsList)) {
-          val locItemsIndex = getIndexOfLocationInLocItems(loc, locItemsList)
-          locItemsList = locItemsList.updated(locItemsIndex, locItemsList.apply(locItemsIndex).addItem(custOrdLine.item.itemID))
-        } else {
-          locItemsList = locItemsList :+ new LocItems(loc, List(custOrdLine.item.itemID))
-        }
-      }
-    }
-    locItemsList
-  }
-  
-  private def getIndexOfLocationInLocItems(loc:Location, locItemsList:List[LocItems]):Int = {
-    println("In getIndex")
-    for(locItems <- locItemsList) {
-      Thread.sleep(1000)
-      if(locItems.loc == loc) {
-        println("Yay")
-        locItemsList.indexOf(locItems)
-      }
-    }
-    throw new Error("Location not in list of LocItems in getIndexOfLocationInLocItems()")
-  }
-  
-  /**
-   * returns true if passed location is contained within passed LocItems list
-   */
-  private def checkForLocationInLocItemsList(loc:Location, locItems:List[LocItems]):Boolean = {
-    if(locItems.isEmpty) {
-      false
-    } else {
-      val locItem = locItems.head
-      if(locItem.loc == loc) {
-        true
+    def itemLocsLoop(orderLinesList:List[CustomerOrderLine], locItemsList:List[LocItems]):List[LocItems] = {
+      if(orderLinesList.isEmpty) {
+        locItemsList
       } else {
-        if(locItems.tail.isEmpty) {
-          false
-        } else {
-          checkForLocationInLocItemsList(loc, locItems.tail)
-        }
+        val orderLine:CustomerOrderLine = orderLinesList.head
+        val locsForItem = locRepo.getAllPossibleLocationsForItem(orderLine.item, orderLine.quantity)
+        addLocationsTolocItemsList(locItemsList, locsForItem, orderLine.item.itemID)
+        List.empty
       }
     }
+    
+    List.empty
+  }
+  
+  private def addLocationsTolocItemsList(locItemsList:List[LocItems], locsForItem:List[Location], itemID:Int) {
+    
+    
+    
   }
   
 }

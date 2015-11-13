@@ -46,6 +46,11 @@ class LocationRepository {
   }
   
   
+  
+  
+  
+  
+  
     /**
      * returns a List of Location Entities for all possible locations from where the passed quantity of the passed Item can be obtained
      */
@@ -130,10 +135,5 @@ class LocationRepository {
 object LocationTst {
   def main(args: Array[String]): Unit = {
     val tst = new LocationRepository()
-    val locs = tst.getAllLocations()
-    for((k,v) <- locs) {
-      v.print()
-      println()
-    }
   }
 }

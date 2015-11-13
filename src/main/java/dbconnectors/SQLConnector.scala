@@ -77,6 +77,36 @@ class SQLConnector {
       pStatement.executeUpdate()
     }
     
+    
+  /**
+   * appends the passed number of ? markers to the passed SQL string and returns the string 
+   */
+  def addMarkersToSQL(sql:String, numberOfMarkers:Int):String = {
+      if(numberOfMarkers == 1) {
+        sql+"? "
+      } else {
+        addMarkersToSQL(sql+"?, ", numberOfMarkers.-(1))
+      }
+    }
+  
+  /**
+   * returns an array of string arrays as ("Int", *intvalue*) from the passed list of Int values
+   * @return Array(Array(String)) with 1st dimension of intList.length, 2nd dimension of 2
+   */
+  def getVarArrayFromIntList(intList:List[Int]):Array[Array[String]] = {
+    
+    def loop(intList:List[Int], varArray:Array[Array[String]]):Array[Array[String]] = {
+      if(intList.isEmpty) {
+        varArray
+      } else {
+        val newInt = Array("Int", intList.head.toString())
+        loop(intList.tail, varArray :+ newInt)
+      }
+    }
+    loop(intList, Array.empty)
+  }
+    
+    
     /**
      * recursive function to move through all variable pairs in the passed array and assign them to the passed statement
      */
