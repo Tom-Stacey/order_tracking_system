@@ -7,6 +7,7 @@ import entities.Location
  * Helper class used for travelling salesman algorithm. Links multiple item IDs with one location
  */
 case class PickupPoint(loc:Location, itemIDs:List[Int]) {
+  
   def contains(chkItem:Int):Boolean = {
     itemIDs.contains(chkItem)
   }
@@ -26,7 +27,7 @@ case class PickupPoint(loc:Location, itemIDs:List[Int]) {
   
   /**
    * removes an item from the item IDs list
-   * @return PickupPoint - a copy of the original Object with item ID removed from the item ID list
+   * @return Option[PickupPoint] - an Option on a copy of the original Object with item ID removed from the item ID list, or None if there are now no more items in the list
    */
   def removeItem(itemID:Int):Option[PickupPoint] = {
     if(contains(itemID)) {

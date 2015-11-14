@@ -22,8 +22,102 @@ class TravellingSalesman {
   
   def getRoute(startingLoc:Location, orderLines:List[CustomerOrderLine]) {
     val possLocs:List[PickupPoint] = pickupsRepo.getPickupPointsForItems(orderLines)
+    val orderedPickups = sortPickups(startingLoc, possLocs)
+    //val nexPickup = getNextPickup(startingLoc, possLocs)
+    
+    
+    for(x <- possLocs) {
+      x.print()
+    }
+    println("---------------------UPDATED-----------------")
+    for(y <- orderedPickups) {
+      y.print()
+      y.loc.printForDemo()
+      println("-------NEXT-------")
+    }
+    
     
   }
+  
+  
+  private def sortPickups(startingLoc:Location, possLocs:List[PickupPoint]):List[PickupPoint] = {
+    
+    def loop(currentLoc:Location, remainingPickups:List[PickupPoint], pickupsAssigned:List[PickupPoint]):List[PickupPoint] = {
+      if(remainingPickups.isEmpty) {
+        pickupsAssigned
+      } else {
+        val nextPickup:PickupPoint = getNextPickup(currentLoc, remainingPickups)
+        val updatedRemainingPickups = removeAllPickupPointItemsFromList(nextPickup, remainingPickups)
+        loop(nextPickup.loc, updatedRemainingPickups, pickupsAssigned :+ nextPickup)
+      }
+    }
+    loop(startingLoc, possLocs, List.empty)
+  }
+  
+  private def removeAllPickupPointItemsFromList(pickup:PickupPoint, otherPickups:List[PickupPoint]):List[PickupPoint] = {
+    
+    def loop(itemIDs:List[Int], remainingPickups:List[PickupPoint]):List[PickupPoint] = {
+      if(itemIDs.isEmpty) {
+        remainingPickups
+      } else {
+        val updatedRemainingPickups = removeItemFromPickupPointsList(itemIDs.head, remainingPickups)
+        loop(itemIDs.tail, updatedRemainingPickups)
+      }
+    }
+    loop(pickup.itemIDs, otherPickups)
+  }
+  
+  /**
+   * removes the passed itemID from the contents list of any PickupPoints in the passed pickups List. If the last item at a pickup, removes that PickupPoint from the pickups list
+   * @return List[PickupPoint] - an updated version of the pickups list with the passed item removed
+   */
+  private def removeItemFromPickupPointsList(itemID:Int, pickups:List[PickupPoint]):List[PickupPoint] = {
+    
+   def loop(startingList:List[PickupPoint], endingList:List[PickupPoint]):List[PickupPoint] = {
+     if(startingList.isEmpty) {
+       endingList
+     } else {
+       val pickup = startingList.head.removeItem(itemID)
+       if(pickup.isEmpty) {
+         loop(startingList.tail, endingList)
+       } else {
+         loop(startingList.tail, endingList :+ pickup.get)
+       }
+     }
+   }
+   loop(pickups, List.empty)
+    
+  }
+  
+  /**
+   * returns the nearest pickup to the passed location from within the passed pickupsToSearch list.
+   * @return Option[PickupPoint] - the nearest pickup point to the passed location, or None if the passed list of pickupsToSearch is empty
+   */
+  private def getNextPickup(loc:Location, pickupsToSearch:List[PickupPoint]):PickupPoint = {
+    
+    def loop(pickups:List[PickupPoint], dist:Int, currentClosest:PickupPoint):PickupPoint = {
+      if(pickups.isEmpty) {
+        currentClosest
+      } else {
+        val newDist = getDistance(loc, pickups.head)
+        if(newDist < dist) {
+          loop(pickups.tail, newDist, pickups.head)
+        } else {
+          loop(pickups.tail, dist, currentClosest)
+        }
+      }
+    }
+    
+    if(pickupsToSearch.isEmpty) {
+      throw new NoSuchElementException()
+    } else {
+      val firstPickup = pickupsToSearch.head
+      loop(pickupsToSearch.tail, getDistance(loc, firstPickup), firstPickup)
+    }
+    
+  }
+  
+  
   
   /**
    * returns the distance between a location and a PickupPoint
@@ -35,14 +129,6 @@ class TravellingSalesman {
     val startingCol = startingLoc.locationCol
     val endingCol = endingLoc.loc.locationCol
     getPointToPointDistance(startingRow, startingCol, endingRow, endingCol)
-    
-  }
-  
-  private def removeItemsFromPickupPointsList(itemID:Int, pickups:List[PickupPoint]) = {
-    
-   def loop(startingList:List[PickupPoint], endingList:List[PickupPoint]) {
-     
-   }
     
   }
   
@@ -100,8 +186,9 @@ class TravellingSalesman {
 object tst {
   def main(args: Array[String]): Unit = {
     val tst = new TravellingSalesman()
-    val loc = new Location(1, "1A", 1000, 500, 3, 3)
-    val pickup = new PickupPoint(new Location(1, "1A", 1000, 500, 4, 1), List(1))
-    println(tst.getDistance(loc, pickup))
+    val custOrdRepo = new CustomerOrderLineRepository()
+    val custOrds = custOrdRepo.getCustomerOrderLines(1)
+    val loc = new Location(1, "1A", 1000, 500, 1, 1)
+    tst.getRoute(loc, custOrds)
   }
 }
