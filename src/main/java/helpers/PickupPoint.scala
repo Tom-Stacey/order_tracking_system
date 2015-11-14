@@ -4,7 +4,7 @@ import entities.Location
 
 /**
  * @author tstacey
- * Helper class used for travelling salesman algorithm. Links multiple item IDs with one location
+ * Helper class used for travelling salesman algorithm. Made up of a single Location Object and a List of itemIDs that can be collected from that location
  */
 case class PickupPoint(loc:Location, itemIDs:List[Int]) {
   

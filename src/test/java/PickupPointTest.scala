@@ -1,5 +1,4 @@
 
-import org.scalatest._
 import entities.Location
 import helpers.PickupPoint
 
@@ -8,7 +7,7 @@ import helpers.PickupPoint
  */
 class PickUpPointTest extends UnitSpec {
   
-  val loc = new Location(1, "1A", 1000, 500, 0, 3)
+  val loc = new Location(1, "1A", 1000, 500, 1, 3)
   // Location Constructor: idLocation:Int, locationName:String, locationLtrVolume:Int, locationLtrVolumeUsed:Int, locationRow:Int, locationCol:Int
   
   val itemIDs = List(1,2,3,4)

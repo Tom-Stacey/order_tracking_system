@@ -9,7 +9,7 @@ class SQLConnectorTest extends UnitSpec {
   
   
   "An SQLConnector Object" should "concatenate the correct number of ? markers onto a passed String" in {
-    val sqlString = "SELECT * FROM table WHERE "
+    val sqlString = "SELECT * FROM table WHERE id IN ("
     val extendedString = dbc.addMarkersToSQL(sqlString, 3)
     
     extendedString should be (sqlString+"?, ?, ? ")

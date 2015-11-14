@@ -1,6 +1,5 @@
 package repositories
 
-import java.sql.ResultSet
 import dbconnectors.SQLConnector
 import entities.Address
 import entities.CustomerOrderStatus
@@ -8,8 +7,9 @@ import entities.Customer
 import entities.Employee
 import helpers.DateTimeConverter
 import entities.CustomerOrder
-import java.time.LocalDate
+import java.sql.ResultSet
 import java.sql.Date
+import java.time.LocalDate
 
 
 /**
