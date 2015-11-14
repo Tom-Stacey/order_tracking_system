@@ -203,19 +203,3 @@ class SQLConnector {
     }
     
 }
-
-object DBTest {
- 
-   def main(args: Array[String]): Unit = {
-     val sqlC = new SQLConnector()
-     sqlC.connect()
-     val varArray:Array[Array[String]] = Array(Array("Int","1"))
-    
-     val rs = sqlC.doPreparedQuery("SELECT forename FROM user WHERE idUser = ?", varArray)
-     val pm = new PrintModule()
-     pm.printResultSet(rs)
-     rs.close()
-     sqlC.disconnect()
-   }
- 
-}

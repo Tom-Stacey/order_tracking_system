@@ -116,13 +116,3 @@ class StockEntryRepository {
   }
   
 }
-
-object StockEntryTst {
-  def main(args: Array[String]): Unit = {
-    val tst = new StockEntryRepository()
-    val stockList = tst.getAllEntriesForItem(3)
-    for(entry <- stockList){
-      entry.print()
-    }
-  }
-}

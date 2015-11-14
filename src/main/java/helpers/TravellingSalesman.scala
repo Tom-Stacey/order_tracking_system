@@ -10,9 +10,10 @@ import entities.CustomerOrder
 
 
 /**
- * Uses a greedy algorithm to return a list of pickup points in to complete customer orders.
+ * Uses a greedy algorithm to return a list of pickup points in order to complete customer orders.
  * searches for the nearest location that contains a sufficient quantity of a certain item to complete one customer order line.
- * It then collects any other items it can from that location that are in the customer order amd removes them from the list of remaining items to be picked up 
+ * It then collects any other items it can from that location that are in the customer order and removes them from the list of remaining items to be picked up
+ * This is repeated for each remaining customer order line until all items have been collected 
  * @author tstacey
  */
 class TravellingSalesman {
@@ -102,7 +103,6 @@ class TravellingSalesman {
      }
    }
    loop(pickups, List.empty)
-    
   }
   
   
@@ -132,7 +132,6 @@ class TravellingSalesman {
       val firstPickup = pickupsToSearch.head
       loop(pickupsToSearch.tail, getDistance(loc, firstPickup), firstPickup)
     }
-    
   }
   
   
@@ -146,7 +145,6 @@ class TravellingSalesman {
     val startingCol = startingLoc.locationCol
     val endingCol = endingLoc.loc.locationCol
     getPointToPointDistance(startingRow, startingCol, endingRow, endingCol)
-    
   }
   
   
@@ -203,17 +201,3 @@ class TravellingSalesman {
 }
 
 
-
-object tst {
-  def main(args: Array[String]): Unit = {
-    val tst = new TravellingSalesman()
-    val custOrdRepo = new CustomerOrderLineRepository()
-    val custOrds = custOrdRepo.getCustomerOrderLines(1)
-    for(x <- custOrds) {
-      x.print()
-      println()
-    }
-    val loc = new Location(1, "1A", 1000, 500, 1, 1)
-    tst.getRoute(loc, custOrds)
-  }
-}

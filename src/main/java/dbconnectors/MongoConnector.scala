@@ -61,13 +61,3 @@ object MongoConnector {
         itemAttributes)
   }
 }
-
-object MongoTest {
-  
-  def main(args: Array[String]): Unit = {
-    val itm:Item = MongoConnector.getItem(1)
-    itm.print()
-    
-    MongoConnector.close()
-  }
-}
