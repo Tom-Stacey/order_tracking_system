@@ -6,16 +6,16 @@ import entities.Location
  * @author tstacey
  * Helper class used for travelling salesman algorithm. Links multiple item IDs with one location
  */
-case class LocItems(loc:Location, itemIDs:List[Int]) {
+case class PickupPoint(loc:Location, itemIDs:List[Int]) {
   def contains(chkItem:Int):Boolean = {
     itemIDs.contains(chkItem)
   }
   
   /**
    * adds a new Item to the item IDs list
-   * @return LocItems - a copy of the original Object with the extra item ID added to the item ID list
+   * @return PickupPoint - a copy of the original Object with the extra item ID added to the item ID list
    */
-  def addItem(itemID:Int):LocItems = {
+  def addItem(itemID:Int):PickupPoint = {
     if(itemIDs.contains(itemID)) {
       this
     } else {
@@ -26,15 +26,24 @@ case class LocItems(loc:Location, itemIDs:List[Int]) {
   
   /**
    * removes an item from the item IDs list
-   * @return LocItems - a copy of the original Object with item ID removed from the item ID list
+   * @return PickupPoint - a copy of the original Object with item ID removed from the item ID list
    */
-  def removeItem(itemID:Int):LocItems = {
-    this.copy(itemIDs = itemIDs.diff(List(itemID)))
+  def removeItem(itemID:Int):Option[PickupPoint] = {
+    if(contains(itemID)) {
+      val cpy = this.copy(itemIDs = itemIDs.diff(List(itemID)))
+      if(cpy.itemIDs.isEmpty) {
+        None
+      } else {
+        Option(cpy)
+      }
+    } else {
+      Option(this)
+    }
   }
   
   
-  def combine(newLocItem:LocItems):LocItems = {
-    val newItems = itemIDs ++ newLocItem.itemIDs
+  def combine(newPickupPoint:PickupPoint):PickupPoint = {
+    val newItems = itemIDs ++ newPickupPoint.itemIDs
     this.copy(itemIDs = newItems)
   }
   
