@@ -9,7 +9,11 @@ class LoginController {
   val userRepo = new UserRepository()
   
   def getLogin(user:String, pass:String):Boolean = {
-    userRepo.checkForValidLoginUsingID(user, pass)
+    if(user != "" && user.forall { Character.isDigit }) {
+      userRepo.checkForValidLoginUsingID(user, pass)
+    } else {
+      false
+    }
   }
   
   

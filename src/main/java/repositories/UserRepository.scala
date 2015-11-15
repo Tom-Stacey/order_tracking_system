@@ -1,6 +1,7 @@
 package repositories
 
 import java.sql.ResultSet
+
 import dbconnectors.SQLConnector
 import entities.User
 
@@ -13,6 +14,7 @@ class UserRepository {
   
   /**
    * returns a User Entity corresponding to the passed userID
+   * @throws NoSuchElementException if the passed ID doesn't correspond to a user ID in the user table
    */
   def getUser(userID:Int):User = {
     val sql = "SELECT idUser, password, forename, surname, email, isEmployee FROM user WHERE idUser = ?"
@@ -20,11 +22,19 @@ class UserRepository {
     connector.connect()
     try {
       val rs:ResultSet = connector.doPreparedQuery(sql, vars)
-      rs.next()
-      createUserFromResultSet(rs)
+      if(!rs.next()) {
+        throw new NoSuchElementException
+      } else {
+        createUserFromResultSet(rs)
+      }
     } finally {
       connector.disconnect()
     }
+  }
+  
+  def getUserName(userID:String):String = {
+    val usr = getUser(userID.toInt)
+    usr.forename+" "+usr.surname
   }
   
   /**
@@ -71,11 +81,4 @@ class UserRepository {
     }
   }
   
-}
-
-object UserRepoTst {
-  def main(args: Array[String]): Unit = {
-    val tst = new UserRepository()
-    tst.getUser(1).print()
-  }
 }

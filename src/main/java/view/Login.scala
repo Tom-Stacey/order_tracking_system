@@ -45,7 +45,7 @@ class Login(source:PrincipalScene) extends BorderPane {
                 onAction = handle {
                   val userText = usernameField.text.get
                   
-                  if(userText != "" && userText.forall { Character.isDigit } && loginController.getLogin(userText, passwordField.text.get)) {
+                  if(loginController.getLogin(userText, passwordField.text.get)) {
                     source.loginUser(userText.toInt)
                   } else {
                     add(new Label("failed") {textFill_=(Color.Red)}, 0, 2)

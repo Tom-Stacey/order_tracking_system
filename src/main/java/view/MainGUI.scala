@@ -19,7 +19,6 @@ object MainGUI extends JFXApp {
     width = 600
     height = 450
     scene = new PrincipalScene {
-      fill = Color.LightGreen
       root = new Login(this)
       }
   }

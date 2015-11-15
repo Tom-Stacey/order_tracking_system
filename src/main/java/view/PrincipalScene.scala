@@ -13,4 +13,8 @@ class PrincipalScene extends Scene {
      root = new OpeningScreen(this, userID)
   }
   
+  def logOut() = {
+    root = new Login(this)
+  }
+  
 }
