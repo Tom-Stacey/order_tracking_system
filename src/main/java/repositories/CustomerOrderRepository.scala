@@ -179,21 +179,3 @@ class CustomerOrderRepository {
   }
   
 }
-
-object custOrdRepoTest {
-  
-  def main(args: Array[String]): Unit = {
-    val cO:CustomerOrderRepository = new CustomerOrderRepository()
-    val originalOrder:CustomerOrder = cO.getCustomerOrder(1)
-    println("------------------ORIGINAL ORDER----------------------------")
-    originalOrder.print()
-    val newOrder = originalOrder.copy(isPaid = false)
-    println("------------------NEW ORDER----------------------------")
-    newOrder.print()
-    cO.updateCustomerOrder(newOrder)
-    val updatedOrder = cO.getCustomerOrder(1)
-    println("------------------UPDATED ORDER----------------------------")
-    updatedOrder.print()
-    
-  }
-}

@@ -159,10 +159,3 @@ class CustomerOrderLineRepository {
   
 }
 
-object CustOrdLineTst {
-  def main(args: Array[String]): Unit = {
-    val tst = new CustomerOrderLineRepository()
-  }
-}
-
-

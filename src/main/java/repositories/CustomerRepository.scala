@@ -42,11 +42,3 @@ class CustomerRepository {
   }
   
 }
-
-
-object CustRepoTst {
-  def main(args: Array[String]): Unit = {
-    val tst = new CustomerRepository()
-    tst.getCustomer(1).print()
-  }
-}

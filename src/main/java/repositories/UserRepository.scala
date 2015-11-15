@@ -32,6 +32,10 @@ class UserRepository {
     }
   }
   
+  /**
+   * returns a concatenated string of a user's forename and surname based on the passed userID
+   * @return String - the user's full name
+   */
   def getUserName(userID:String):String = {
     val usr = getUser(userID.toInt)
     usr.forename+" "+usr.surname

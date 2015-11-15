@@ -56,14 +56,3 @@ class CustomerOrderStatusRepository {
   }
 
 }
-
-object CustOrdStatusTest {
-  
-  def main(args: Array[String]): Unit = {
-    
-    val tst = new CustomerOrderStatusRepository()
-    val a = tst.getStatus(2)
-      println("ID: "+a.statusID+" Val: "+a.status)
-    
-  }
-}

@@ -11,6 +11,7 @@ object MainProgram {
   val OPTIONS_IN_MAIN = 4
   val OPTIONS_IN_PURCHASE_ORDER_SUMMARY = 3
   val OPTIONS_IN_INDIVIDUAL_PURCHASE_ORDER = 1
+  val OPTIONS_IN_CUSTOMER_ORDER =  1
   
   
   val custOrderRepo = new CustomerOrderRepository()
@@ -282,9 +283,38 @@ object MainProgram {
     for(custOrd <- custOrders) {
      custOrd.printForDemo(); println()
     }
-    println("Press Enter to return to main menu")
-    readLine()
-    runOpeningScreen()
+    println()
+    showCustomerOrderOptions()
+  }
+  
+  private def showCustomerOrderOptions() {
+    println("1: Get pickup locations for Customer Order")
+    println("0: Return to main menu")
+    processCustomerOrderOptions(readLine())
+  }
+  
+  private def processCustomerOrderOptions(input:String) {
+    if(!checkForNumberInput(input, OPTIONS_IN_CUSTOMER_ORDER)) {
+      println("Please enter a number between 0 and "+OPTIONS_IN_CUSTOMER_ORDER)
+      showCustomerOrderOptions()
+    } else {
+      input.toInt match {
+        case 0 => runOpeningScreen()
+        case 1 => {
+          println("Enter Customer Order ID to collect")
+          showItemLocsForCustomerOrder(readLine())
+        }
+      }
+    }
+  }
+  
+  private def showItemLocsForCustomerOrder(input:String) {
+    if(!checkForNumberInput(input)) {
+      println("please enter a valid Customer Order ID")
+      processCustomerOrderOptions("1")
+    } else {
+      // TODO get all customer order lines and show them in order
+    }
   }
   
   private def showStockLevels() {

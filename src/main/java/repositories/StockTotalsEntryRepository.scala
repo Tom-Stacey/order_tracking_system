@@ -73,16 +73,3 @@ class StockTotalsEntryRepository {
   
 }
 
-
-
-object StockTotalsTst {
-  def main(args: Array[String]): Unit = {
-    val tst = new StockTotalsEntryRepository()
-    val totals = tst.getAllStockTotalEntries()
-    for(stockLine <- totals) {
-      stockLine.print()
-    }
-    println()
-    tst.getStockTotalEntryForItem(1).print()
-  }
-}

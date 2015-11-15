@@ -199,15 +199,3 @@ class PurchaseOrderLineRepository {
     
 }
 
-object PurchaseOrdLineTst {
-  def main(args: Array[String]): Unit = {
-    val locRepo = new LocationRepository()
-    val tst = new PurchaseOrderLineRepository()
-    val lines = tst.getPurchaseOrderLines(1)
-    val ord = lines.head
-    ord.print()
-    val loc = locRepo.getAllLocations().get(5).get
-    tst.storePurchaseOrderLine(ord, loc)
-  }
-}
-

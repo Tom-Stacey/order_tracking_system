@@ -131,9 +131,3 @@ class LocationRepository {
     
 }
 
-
-object LocationTst {
-  def main(args: Array[String]): Unit = {
-    val tst = new LocationRepository()
-  }
-}

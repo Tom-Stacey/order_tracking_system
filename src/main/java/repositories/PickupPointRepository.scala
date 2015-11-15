@@ -132,23 +132,6 @@ class PickupPointRepository {
   
 }
 
-object TestPickupPointsRepo {
-  def main(args: Array[String]): Unit = {
-    val custOrdRepo = new CustomerOrderLineRepository()
-    val tst = new PickupPointRepository()
-    val custOrds = custOrdRepo.getCustomerOrderLines(1)
-    for(x <- custOrds) {
-      x.print()
-      println()
-    }
-    
-    val pickupPoints = tst.getPickupPointsForItems(custOrds)
-    println("--------------LOCATIONS-------------------")
-    for(l <- pickupPoints) {
-      l.print()
-    }
-  }
-}
 
 
 

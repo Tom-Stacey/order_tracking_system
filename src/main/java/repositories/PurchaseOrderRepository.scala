@@ -131,10 +131,3 @@ class PurchaseOrderRepository {
 }
 
 
-object PurchaseOrderTst {
-  def main(args: Array[String]): Unit = {
-    val tst = new PurchaseOrderRepository()
-    tst.getPurchaseOrder(1).print()
-  }
-}
-
