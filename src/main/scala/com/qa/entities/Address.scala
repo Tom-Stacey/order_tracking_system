@@ -13,4 +13,13 @@ case class Address(addressID:Int, addressLines:Map[String,String], city:String, 
     println("PostCode: "+postCode) 
   }
   
+  
+  def getAddressLines():Option[Map[String,String]] = {
+    if(addressLines.isEmpty) {
+      None
+    } else {
+      Option(addressLines)
+    }
+  }
+  
 }

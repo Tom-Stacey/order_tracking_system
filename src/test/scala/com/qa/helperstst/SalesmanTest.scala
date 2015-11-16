@@ -1,12 +1,15 @@
 
+package com.qa.helperstst
+
 import com.qa.entities.Location
 import com.qa.helpers.PickupPoint
 import com.qa.helpers.TravellingSalesman
+import org.scalatest._
 
 /**
  * @author tstacey
  */
-class SalesmanTest extends UnitSpec {
+class SalesmanTest extends FlatSpec with Matchers {
 
   val salesman = new TravellingSalesman()
   

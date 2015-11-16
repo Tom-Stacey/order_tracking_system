@@ -1,11 +1,14 @@
 
+package com.qa.helperstst
+
 import com.qa.entities.Location
 import com.qa.helpers.PickupPoint
+import org.scalatest._
 
 /**
  * @author tstacey
  */
-class PickUpPointTest extends UnitSpec {
+class PickUpPointTest extends FlatSpec with Matchers {
   
   val loc = new Location(1, "1A", 1000, 500, 1, 3)
   // Location Constructor: idLocation:Int, locationName:String, locationLtrVolume:Int, locationLtrVolumeUsed:Int, locationRow:Int, locationCol:Int

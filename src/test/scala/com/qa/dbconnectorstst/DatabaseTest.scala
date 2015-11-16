@@ -1,15 +1,18 @@
 
 
+package com.qa.dbconnectorstst
+
 import com.qa.dbconnectors.SQLConnector
 import com.qa.dbconnectors.MongoConnector
 import java.sql.ResultSet
 import com.qa.entities.Item
 import com.qa.entities.Address
+import org.scalatest._
 
  /**
  * @author tstacey
  */
-class DatabaseTest extends UnitSpec {
+class DatabaseTest extends FlatSpec with Matchers  {
   val dbc = new SQLConnector()
   
   "The SQL Database" should "pull all relevant columns from the customer table" in {

@@ -1,12 +1,15 @@
 
 
+package com.qa.helperstst
+
 import com.qa.helpers.DateTimeConverter
+import org.scalatest._
 
 
 /**
  * @author tstacey
  */
-class DateTimeConverterTest extends UnitSpec {
+class DateTimeConverterTest extends FlatSpec with Matchers {
   val dateTimeConverter = new DateTimeConverter()
   
   "A DateConverter" should "convert an SQL date into a corresponding LocalDate" in {

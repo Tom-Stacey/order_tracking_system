@@ -1,10 +1,11 @@
 
 import com.qa.dbconnectors.SQLConnector
+import org.scalatest._
 
 /**
  * @author tstacey
  */
-class SQLConnectorTest extends UnitSpec {
+class SQLConnectorTest extends FlatSpec with Matchers {
   val dbc = new SQLConnector()
   
   

@@ -26,6 +26,7 @@ class CustomerOrderRepository {
   
   /**
    * returns a list of CustomerOrder entities from all Customer Orders in the database
+   * @return List[CustomerOrder] - all Customer Orders in the SQL database
    */
   def getAllCustomerOrders():List[CustomerOrder] = {
     val sql:String = "SELECT idCustomerOrder, datePlaced, dateShipped, isPaid, idAddress, idCustomerOrderStatus, idEmployee, idCustomer FROM customerorder"
@@ -33,6 +34,10 @@ class CustomerOrderRepository {
     try {
       val rs:ResultSet = connector.doSimpleQuery(sql)
       createCustomerOrdersFromResultSet(rs)
+    } catch {
+        case noElement:NoSuchElementException => {
+        List.empty
+      }
     } finally {
       connector.disconnect()
     }
@@ -63,8 +68,7 @@ class CustomerOrderRepository {
   
   /**
    * returns a list of CustomerOrder Entities that have the passed statusID
-   * @return CustomerOrder - the customer order corresponding to the passed ID
-   * @throws NoSuchElementException if no customer order by that ID found
+   * @return List[CustomerOrder] - the customer orders corresponding to the passed status ID
    */
   def getCustomerOrdersByStatusID(statusID:Int):List[CustomerOrder] = {
     val sql:String = "SELECT idCustomerOrder, datePlaced, dateShipped, isPaid, idAddress, idCustomerOrderStatus, idEmployee, idCustomer "+
@@ -73,6 +77,10 @@ class CustomerOrderRepository {
     try {
       val rs:ResultSet = connector.doPreparedQuery(sql, vars)
       createCustomerOrdersFromResultSet(rs)
+    } catch {
+        case noElement:NoSuchElementException => {
+        List.empty
+      }
     } finally {
       connector.disconnect()
     }
@@ -81,6 +89,7 @@ class CustomerOrderRepository {
   
   /**
    * returns a list of CustomerOrder Entities corresponding to the passed CustomerOrderStatus
+   * @return List[CustomerOrder] - the customer orders corresponding to the passed status
    */
   def getCustomerOrdersByStatusID(status:CustomerOrderStatus):List[CustomerOrder] = {
     getCustomerOrdersByStatusID(status.statusID)
@@ -88,6 +97,7 @@ class CustomerOrderRepository {
   
   /**
    * returns a list of CustomerOrder Entities that have the passed statusID
+   * @return List[CustomerOrder] - the customer orders that belong to the employee indicated by the passed employeeID
    */
   def getCustomerOrdersByEmployeeID(employeeID:Int):List[CustomerOrder] = {
     val sql:String = "SELECT idCustomerOrder, datePlaced, dateShipped, isPaid, idAddress, idCustomerOrderStatus, idEmployee, idCustomer "+
@@ -96,7 +106,11 @@ class CustomerOrderRepository {
     try {
       val rs:ResultSet = connector.doPreparedQuery(sql, vars)
       createCustomerOrdersFromResultSet(rs)
-    } finally {
+    } catch {
+        case noElement:NoSuchElementException => {
+        List.empty
+      }
+    }finally {
       connector.disconnect()
     }
   }
@@ -182,6 +196,7 @@ class CustomerOrderRepository {
   
   /**
    * returns an Option on the "datePlaced" field of the passed row of the ResultSet, or None if the datePlaced is null
+   * @return Option[java.time.LocalDate] - none if datePlaced row is null
    */
   private def getDateShipped(rs:ResultSet):Option[LocalDate] = {
     rs.getDate("dateShipped")
