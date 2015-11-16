@@ -1,7 +1,7 @@
 
-import entities.Location
-import helpers.PickupPoint
-import helpers.TravellingSalesman
+import com.qa.entities.Location
+import com.qa.helpers.PickupPoint
+import com.qa.helpers.TravellingSalesman
 
 /**
  * @author tstacey

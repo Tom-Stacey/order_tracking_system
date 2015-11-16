@@ -1,10 +1,10 @@
 
 
-import dbconnectors.SQLConnector
-import dbconnectors.MongoConnector
+import com.qa.dbconnectors.SQLConnector
+import com.qa.dbconnectors.MongoConnector
 import java.sql.ResultSet
-import entities.Item
-import entities.Address
+import com.qa.entities.Item
+import com.qa.entities.Address
 
  /**
  * @author tstacey

@@ -1,6 +1,6 @@
 
 
-import helpers.DateTimeConverter
+import com.qa.helpers.DateTimeConverter
 
 
 /**

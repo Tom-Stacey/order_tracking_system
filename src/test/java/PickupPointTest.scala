@@ -1,6 +1,6 @@
 
-import entities.Location
-import helpers.PickupPoint
+import com.qa.entities.Location
+import com.qa.helpers.PickupPoint
 
 /**
  * @author tstacey

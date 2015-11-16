@@ -1,5 +1,5 @@
 
-import dbconnectors.SQLConnector
+import com.qa.dbconnectors.SQLConnector
 
 /**
  * @author tstacey
