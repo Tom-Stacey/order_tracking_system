@@ -1,0 +1,43 @@
+use warehouseTracking
+db.items.insert (
+	[
+		{
+				"ItemID" : 1,
+				"ItemName" : "Red Gnome",
+				"ItemDescription" : "A gnome with a red hat and coat",
+				"ItemVolume" : 1000,
+				"ImageLocation" : "redGnome.png",
+				"SupplierID" : 1,
+				"ItemAttributes" : {
+						"Hat Color" : "Red",
+						"Accessory" : "Fishing Rod"
+				}
+		},
+		{
+				"ItemID" : 2,
+				"ItemName" : "Blue Gnome",
+				"ItemDescription" : "A gnome with a blue hat and a big blue beard",
+				"ItemVolume" : 1000,
+				"ImageLocation" : "blueGnome.png",
+				"SupplierID" : 1,
+				"ItemAttributes" : {
+						"Hat Color" : "Blue",
+						"Accessory" : "Axe",
+						"Beard Color" : "Blue"
+				}
+		},
+		{
+				"ItemID" : 3,
+				"ItemName" : "Green Gnome",
+				"ItemDescription" : "A gnome with a green hat and a pitchfork",
+				"ItemVolume" : 1000,
+				"ImageLocation" : "greenGnome.png",
+				"SupplierID" : 1,
+				"ItemAttributes" : {
+						"Hat Color" : "Green",
+						"Accessory" : "Pitchfork",
+						"Beard Color" : "Brown"
+				}
+		}
+	]
+)

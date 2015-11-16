@@ -1,0 +1,1 @@
+Using a mongo connection in terminal, run the two scripts from MongoAddressInsertTemplate.txt and MongoItemInsertTemplate.txt in order to create the database warehouseTracking and create/populate the addresses and items collections
