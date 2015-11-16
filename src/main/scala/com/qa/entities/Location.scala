@@ -20,4 +20,12 @@ case class Location(idLocation:Int, locationName:String, locationLtrVolume:Int, 
     println("   Location Name: "+locationName+", Warehouse Row: "+locationRow+", Warehouse Column: "+locationCol)
     println("   Total Space: "+locationLtrVolume+"ltr, Space Used: "+locationLtrVolumeUsed+"ltr, Space Available: "+locationLtrVolume.-(locationLtrVolumeUsed)+"ltr")
   }
+  
+  /**
+   * returns the amount of volume available to use at the location
+   * @return Int - the litre volume of free space in the location
+   */
+  def getAvailableVolume():Int = {
+    locationLtrVolume-locationLtrVolumeUsed
+  }
 }
