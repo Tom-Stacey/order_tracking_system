@@ -17,6 +17,7 @@ class SQLConnectorTest extends FlatSpec with Matchers {
     
   }
   
+  
   it should "produce an array suitable to be passed back into a prepared statement" in {
     val intList = List(1,2,3)
     val intListUpdated = dbc.getVarArrayFromIntList(intList)

@@ -68,7 +68,7 @@ class CustomerOrderRepository {
   
   /**
    * returns a list of CustomerOrder Entities that have the passed statusID
-   * @return List[CustomerOrder] - the customer orders corresponding to the passed status ID
+   * @return List[CustomerOrder] - the customer orders corresponding to the passed status ID or List.Empty if no orders by that status
    */
   def getCustomerOrdersByStatusID(statusID:Int):List[CustomerOrder] = {
     val sql:String = "SELECT idCustomerOrder, datePlaced, dateShipped, isPaid, idAddress, idCustomerOrderStatus, idEmployee, idCustomer "+
@@ -89,7 +89,7 @@ class CustomerOrderRepository {
   
   /**
    * returns a list of CustomerOrder Entities corresponding to the passed CustomerOrderStatus
-   * @return List[CustomerOrder] - the customer orders corresponding to the passed status
+   * @return List[CustomerOrder] - the customer orders corresponding to the passed status or List.Empty if no orders by that status
    */
   def getCustomerOrdersByStatusID(status:CustomerOrderStatus):List[CustomerOrder] = {
     getCustomerOrdersByStatusID(status.statusID)
@@ -117,6 +117,7 @@ class CustomerOrderRepository {
   
   /**
    * returns a list of CustomerOrder Entities that belong to the passed Employee
+   * @return List[CustomerOrder] - the customer orders that belong to the employee indicated by the passed employeeID
    */
   def getCustomerOrdersByEmployeeID(employee:Employee):List[CustomerOrder] = {
     getCustomerOrdersByEmployeeID(employee.employeeUser.idUser)
@@ -145,6 +146,10 @@ class CustomerOrderRepository {
     }
   }
   
+  /**
+   * returns 'null' if passed Option is None, or a string of the Option's LocalDate value
+   * @return String - date string in format 'yyyy-mm-dd' or 'null'  
+   */
   private def getSQLDateStringFromOption(d:Option[LocalDate]) = {
     if(d.isEmpty) {
       "null"

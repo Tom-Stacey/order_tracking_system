@@ -4,6 +4,8 @@ import com.qa.repositories._
 import com.qa.entities._
 
 /**
+ * The main text-based UI for the program
+ * Follows a sequence of logical steps with user input at the end of each step
  * @author tstacey
  */
 object MainProgram {

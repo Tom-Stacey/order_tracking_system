@@ -18,6 +18,7 @@ class CustomerOrderLineRepository {
   
   /**
    * returns a single CustomerOrderLine Entity corresponding to the passed customer order ID and Item ID
+   * @return CustomerOrderLine
    */
   def getCustomerOrderLine(customerOrderID:Int, itemID:Int):CustomerOrderLine = {
     val sql = "SELECT idItem, quantity, picked FROM customerorderline WHERE idCustomerOrder = ? AND idItem = ? "
@@ -40,6 +41,7 @@ class CustomerOrderLineRepository {
   
   /**
    * returns an array of all customer order lines corresponding to the passed customer order ID
+   * @return List[CustomerOrderLine] - all order lines corresponding to the passed customerOrderID
    */
   def getCustomerOrderLines(customerOrderID:Int): List[CustomerOrderLine] = {
     val customerOrder = orderRepo.getCustomerOrder(customerOrderID)
@@ -48,6 +50,7 @@ class CustomerOrderLineRepository {
   
   /**
    * returns an array of all customer order lines that belong to the passed Customer Order Entity
+   * @return List[CustomerOrderLine] - all order lines that belong to the passed Customer Order
    */
   def getCustomerOrderLines(customerOrder:CustomerOrder): List[CustomerOrderLine] = {
     getAllCustomerOrderLines(customerOrder)
@@ -55,6 +58,7 @@ class CustomerOrderLineRepository {
   
   /**
    * retrieves all customer order lines from the SQL database and returns them as a list of CustomerOrderLine entities
+   * @return List[CustomerOrderLine] or List.empty if the passed Order has no Order Lines
    */
   private def getAllCustomerOrderLines(custOrd:CustomerOrder): List[CustomerOrderLine] = {
     val sql:String = "SELECT idItem, quantity, picked FROM customerorderline WHERE idCustomerOrder = ? ORDER BY idItem"
@@ -63,6 +67,8 @@ class CustomerOrderLineRepository {
     try {
       val rs:ResultSet = connector.doPreparedQuery(sql, vars)
       createCustomerOrderLinesFromResultSet(rs, custOrd)
+    } catch {
+      case noSuchElement:NoSuchElementException => {List.empty}
     } finally {
       connector.disconnect()
     }
@@ -70,6 +76,7 @@ class CustomerOrderLineRepository {
   
   /**
    * returns a list of the item IDs from each of the CustomerOrderLine Entities in the passed List
+   * @return List[Int] - all items in the Order Lines
    */
   def getListOfItemIDsFromCustomerOrderLines(lines:List[CustomerOrderLine]):List[Int] = {
     def loop(inList:List[CustomerOrderLine], outList:List[Int]):List[Int] = {
@@ -86,6 +93,7 @@ class CustomerOrderLineRepository {
   /**
    * Updates the SQL database to mark the passed customer order line as picked and updates the stock levels at the passed location to match
    * Returns a copy of the passed CustomerOrderLine with the picked boolean set to true
+   * @return CustomerOrderLine - updated copy of the passed CustomerOrderLine with picked = true
    */
   def pickOrderLineItem(orderLine:CustomerOrderLine, loc:Location):CustomerOrderLine = {
     connector.connect()

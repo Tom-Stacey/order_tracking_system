@@ -5,6 +5,7 @@ import com.qa.entities.Address
 import com.qa.entities.Item
 
 /**
+ * Connects to the MongoSQL database in order to pull Address and Item information
  * @author tstacey
  */
 object MongoConnector {
@@ -20,6 +21,7 @@ object MongoConnector {
   
   /**
    * returns an address entity from the MongoDB corresponding to the passed address ID
+   * @returns Address - the address in the MongoDB database that corresponds to the passed address ID
    */
   def getAddress(addressID:Int):Address = {
     val queryObject = MongoDBObject("AddressID" -> addressID)
@@ -29,6 +31,7 @@ object MongoConnector {
   
   /**
    * returns an Address Entity from a mongo object
+   * @returns Address
    */
   private def makeAddressEntityFromMongoDBObject(addrObj:MongoDBObject):Address = {
     val addrLines:Map[String,String] = addrObj.getAs[Map[String,String]]("AddressLines").get
@@ -40,6 +43,7 @@ object MongoConnector {
   
   /**
    * returns an Item entity from the MongoDB corresponding to the passed item ID
+   * @return Item - the Item in the MongoDB database that corresponds to the passed Item ID
    */
   def getItem(itemID:Int):Item = {
     val queryObject = MongoDBObject("ItemID" -> itemID)
@@ -49,6 +53,7 @@ object MongoConnector {
   
   /**
    * returns an Item Entity from a mongo object
+   * @return Item
    */
   private def makeItemEntityFromMongoDBObject(itemObj:MongoDBObject):Item = {
     val itemAttributes:Map[String,String] = itemObj.getAs[Map[String,String]]("ItemAttributes").get

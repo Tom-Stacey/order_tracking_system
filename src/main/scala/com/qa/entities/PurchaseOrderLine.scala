@@ -20,7 +20,8 @@ case class PurchaseOrderLine(item:Item, purchaseOrder:PurchaseOrder, quantity:In
   }
   
   /**
-   * returns the number of non-damaged items in a PurchaseOrderLine 
+   * returns the number of non-damaged items in a PurchaseOrderLine
+   * @return Int - the number of non-damaged items
    */
   def getUndamagedItems():Int = {
     quantity - quantityDamaged.getOrElse(0)

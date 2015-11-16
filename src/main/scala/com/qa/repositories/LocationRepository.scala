@@ -16,6 +16,7 @@ class LocationRepository {
   
   /**
    * returns a map of all Locations in the SQL database, ordered by locationID
+   * @return SortedMap[Int,Location]
    */
   def getAllLocations():SortedMap[Int,Location] = {
     val sql:String = "SELECT idLocation, locationName, locationLtrVolume, locationLtrVolumeUsed, locationRow, locationCol FROM location ORDER BY idLocation"
@@ -30,6 +31,9 @@ class LocationRepository {
     
     }
   
+  /**
+   * returns a Location Entity from the SQL database corresponding to the passed Location ID
+   */
   def getLocation(locationID:Int):Location = {
     val sql:String = "SELECT idLocation, locationName, locationLtrVolume, locationLtrVolumeUsed, locationRow, locationCol FROM location WHERE idLocation = ? "
     val vars:Array[Array[String]] = Array(

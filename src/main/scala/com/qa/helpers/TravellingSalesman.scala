@@ -11,6 +11,7 @@ import com.qa.entities.CustomerOrder
 
 /**
  * Uses a greedy algorithm to return a list of pickup points in order to complete customer orders.
+ * https://en.wikipedia.org/wiki/Greedy_algorithm
  * searches for the nearest location that contains a sufficient quantity of a certain item to complete one customer order line.
  * It then collects any other items it can from that location that are in the customer order and removes them from the list of remaining items to be picked up
  * This is repeated for each remaining customer order line until all items have been collected 
@@ -19,6 +20,7 @@ import com.qa.entities.CustomerOrder
 class TravellingSalesman {
   // the number of rows in each aisle of the warehouse
   val WAREHOUSE_ROWS = 4
+  val distanceCalculator = new DistanceCalculator(WAREHOUSE_ROWS)
   
   val connector:SQLConnector = new SQLConnector()
   
@@ -117,7 +119,7 @@ class TravellingSalesman {
       if(pickups.isEmpty) {
         currentClosest
       } else {
-        val newDist = getDistance(loc, pickups.head)
+        val newDist = distanceCalculator.getDistance(loc, pickups.head)
         if(newDist < dist) {
           loop(pickups.tail, newDist, pickups.head)
         } else {
@@ -130,74 +132,11 @@ class TravellingSalesman {
       throw new NoSuchElementException()
     } else {
       val firstPickup = pickupsToSearch.head
-      loop(pickupsToSearch.tail, getDistance(loc, firstPickup), firstPickup)
+      loop(pickupsToSearch.tail, distanceCalculator.getDistance(loc, firstPickup), firstPickup)
     }
   }
   
   
-  /**
-   * returns the distance between a location and a PickupPoint
-   * @return Int - distance between the two points
-   */
-  def getDistance(startingLoc:Location, endingLoc:PickupPoint):Int = {
-    val startingRow = startingLoc.locationRow
-    val endingRow = endingLoc.loc.locationRow
-    val startingCol = startingLoc.locationCol
-    val endingCol = endingLoc.loc.locationCol
-    getPointToPointDistance(startingRow, startingCol, endingRow, endingCol)
-  }
-  
-  
-  /**
-   * returns the distance between two row,column points as dictated by the size of the warehouse
-   * @return Int
-   */
-  private def getPointToPointDistance(startingRow:Int, startingCol:Int, endingRow:Int, endingCol:Int):Int = {
-    if(startingCol == endingCol) {
-      getSameColRowDistance(startingRow, endingRow)
-    } else {
-      val columnsMove = getColumnDistance(startingCol, endingCol)
-      val rowsMove = getRowDistance(startingRow, endingRow)
-      columnsMove + rowsMove
-    }
-  }
-  
-  
-  /**
-   * the distance between two rows in the same column
-   * @return Int
-   */
-  private def getSameColRowDistance(startRow:Int, endRow:Int):Int = {
-    if(startRow > endRow) {
-      startRow - endRow
-    } else {
-      endRow - startRow
-    }
-  }
-  
-  
-  /**
-   * the distance between two columns
-   * @return Int
-   */
-  private def getColumnDistance(startCol:Int, endCol:Int):Int = {
-    if(startCol > endCol) {
-      startCol - endCol
-    } else {
-      endCol - startCol
-    }
-  }
-  
-  
-  /**
-   * the vertical distance between two rows in different columns
-   * @return Int - the shorter difference of going either up or down to get from one row to the other 
-   */
-  private def getRowDistance(startRow:Int, endRow:Int):Int = {
-    val upwardsDistance = (WAREHOUSE_ROWS+1 - startRow)+(WAREHOUSE_ROWS+1 - endRow)
-    val downwardsDistance = startRow+endRow
-    if(upwardsDistance > downwardsDistance) downwardsDistance else upwardsDistance
-  }
 }
 
 

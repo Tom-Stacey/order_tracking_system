@@ -17,6 +17,8 @@ class CustomerRepository {
   
   /**
    * returns a Customer Entity corresponding to the passed custID
+   * @return Customer
+   * @throws NoSuchElementException if there is no Customer corresponding to the passed Customer ID
    */
   def getCustomer(custID:Int):Customer = {
     val sql = "SELECT idUser, dateOfBirth, credit, phoneNumber, blackStrikes FROM customer WHERE idUser = ?"
@@ -24,8 +26,11 @@ class CustomerRepository {
     connector.connect()
     try {
       val rs:ResultSet = connector.doPreparedQuery(sql, vars)
-      rs.next()
-      createUserFromResultSet(rs)
+      if(!rs.next()) {
+        throw new NoSuchElementException
+      } else {
+        createUserFromResultSet(rs)
+      }
     } finally {
       connector.disconnect()
     }
@@ -33,6 +38,7 @@ class CustomerRepository {
   
   /**
    * returns a single Customer entity from the passed ResultSet at the ResultSet's current row
+   * @return Customer
    */
   private def createUserFromResultSet(rs:ResultSet):Customer = {
     val birth = rs.getDate("dateOfBirth")

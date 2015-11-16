@@ -5,14 +5,15 @@ import scalafx.collections.ObservableBuffer
 
 
 /**
- * @author tstacey
  * A helper class in order to translate Lists and Maps into Observable Buffers and vice versa.
  * Used when moving data from Model to View and back
+ * @author tstacey
  */
 class BufferConverter {
   
   /**
-   * Converts a scalafx.collections.ObservableBuffer into a List
+   * Converts a List of any object into a scalafx.collections.ObservableBuffer of the same object
+   * @return scalafx.collections.ObservableBuffer[T]
    */
   def getObservableBufferFromList[T](list:List[T]):ObservableBuffer[T] = {
     

@@ -10,6 +10,7 @@ import java.sql.CallableStatement
 import com.qa.helpers.DateTimeConverter
 
 /**
+ * connects to the SQL database and contains convenience methods for carrying out prepared statements
  * @author tstacey
  */
 class SQLConnector {
@@ -43,6 +44,7 @@ class SQLConnector {
     
     /**
      * carries out a simple query to the SQL database using the passed SQL string. No parameters
+     * @return ResultSet
      */
     def doSimpleQuery(sql:String):ResultSet = {
         val statement = connection.createStatement()
@@ -51,6 +53,7 @@ class SQLConnector {
     
     /**
      * performs a simple update on the SQL database using the passed SQL string. No parameters
+     * @return Int - the number of rows in the database that have been updated
      */
     def doSimpleUpdate(sql:String):Int = {
         val statement = connection.createStatement()
@@ -59,8 +62,7 @@ class SQLConnector {
     
     /**
      * creates a prepared statement from the passed SQL string and variable pairs and queries the database
-     * @param sql - the SQL string to be executed
-     * @param variables - a 2-dimensional array of variableType/variableValue pairs (e.g. "Int","2") to be inserted into the prepared statement
+     * @return ResultSet
      */
     def doPreparedQuery(sql:String, variables:Array[Array[String]]):ResultSet = {
       val pStatement = connection.prepareStatement(sql)
@@ -70,8 +72,9 @@ class SQLConnector {
     
     /**
      * creates a prepared statement from the passed SQL string and variable pairs and updates the database
+     * @return Int - the number of rows in the database that have been updated
      */
-    def doPreparedUpdate(sql:String, variables:Array[Array[String]]):Unit = {
+    def doPreparedUpdate(sql:String, variables:Array[Array[String]]):Int = {
       val pStatement = connection.prepareStatement(sql)
       addVariablesToPreparedStatement(0, pStatement, variables)
       pStatement.executeUpdate()
@@ -79,7 +82,8 @@ class SQLConnector {
     
     
   /**
-   * appends the passed number of ? markers to the passed SQL string and returns the string 
+   * appends the passed number of ? markers to the passed SQL string and returns the updated string
+   * @return String - the original string with the desired number of comma-separated ? markers
    */
   def addMarkersToSQL(sql:String, numberOfMarkers:Int):String = {
       if(numberOfMarkers == 1) {

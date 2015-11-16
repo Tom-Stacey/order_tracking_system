@@ -8,6 +8,10 @@ import com.qa.entities.Address
  */
 class AddressRepository {
   
+  /**
+   * returns an Address Entity corresponding to the passed addressID
+   * @return Address
+   */
   def getAddress(addressID: Int):Address = {
     MongoConnector.getAddress(addressID)
   }
