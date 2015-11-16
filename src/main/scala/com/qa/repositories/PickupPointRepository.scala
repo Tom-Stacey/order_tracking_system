@@ -16,6 +16,7 @@ class PickupPointRepository {
   
   /**
    * produces a list of all Pickup Points in the warehouse to collect the items from the passed Customer Order
+   * @return List[PickupPoint]
    */
   def getPickupPointsForItems(customerOrder:CustomerOrder):List[PickupPoint] = {
     val orderLines = orderLineRepo.getCustomerOrderLines(customerOrder)
@@ -24,6 +25,7 @@ class PickupPointRepository {
   
   /**
    * produces a list of all Pickup Points in the warehouse to collect the items from the passed List of CustomerOrderLines
+   * @return List[PickupPoint]
    */
   def getPickupPointsForItems(customerOrderLines:List[CustomerOrderLine]):List[PickupPoint] = {
     var sql = "SELECT stock.itemID, stock.quantity-stock.quantityClaimed AS quantityAvailable, stock.idLocation AS idLocation, locationName, locationLtrVolume, locationLtrVolumeUsed, locationRow, locationCol "+

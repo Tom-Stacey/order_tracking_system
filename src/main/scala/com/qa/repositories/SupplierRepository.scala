@@ -14,6 +14,8 @@ class SupplierRepository {
   
   /**
    * returns a Supplier Entity corresponding to the passed supplierID
+   * @return Supplier
+   * @throws NoSuchElementException if there is no Supplier corresponding to the pased Supplier ID
    */
   def getSupplier(supplierID:Int):Supplier = {
     val sql = "SELECT idSupplier, supplierName, telephoneNumber, email, idAddress FROM supplier WHERE idSupplier = ?"
@@ -21,8 +23,11 @@ class SupplierRepository {
     connector.connect()
     try {
       val rs:ResultSet = connector.doPreparedQuery(sql, vars)
-      rs.next()
-      createSupplierFromResultSetRow(rs)
+      if(!rs.next()) {
+        throw new NoSuchElementException
+      } else {
+        createSupplierFromResultSetRow(rs)
+      }
     } finally {
       connector.disconnect()
     }
@@ -31,6 +36,7 @@ class SupplierRepository {
   
   /**
    * returns a single Supplier Entity created from the current row of the passed ResultSet
+   * @return Supplier
    */
   private def createSupplierFromResultSetRow(rs:ResultSet):Supplier = {
     val addr = addressRepo.getAddress(rs.getInt("idAddress"))

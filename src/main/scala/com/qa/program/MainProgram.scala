@@ -164,20 +164,27 @@ object MainProgram {
   }
   
   private def updatePurchaseOrderStatus(input:String) {
-    if(!checkForNumberInput(input) || !purchaseOrderRepo.checkForValidOrderID(input.toInt)) {
+    if(!checkForNumberInput(input)) {
       println("Please enter a valid Purchase Order ID: ")
       updatePurchaseOrderStatus(readLine())
     } else {
-      val purchaseOrder = purchaseOrderRepo.getPurchaseOrder(input.toInt)
-      purchaseOrder.printForDemo()
-      println("Enter the desired statusID from the list below, or 0 to return to the main menu")
-      for((k,v) <- purchaseOrderStatusRepo.statuses) {
-        println("ID: "+k+", Status: "+v.status)
+      try {
+        val purchaseOrder = purchaseOrderRepo.getPurchaseOrder(input.toInt)
+        purchaseOrder.printForDemo()
+        println("Enter the desired statusID from the list below, or 0 to return to the main menu")
+        for((k,v) <- purchaseOrderStatusRepo.statuses) {
+          println("ID: "+k+", Status: "+v.status)
+        }
+        val statusVal = readLine()
+        purchaseOrderRepo.setStatus(statusVal.toInt, purchaseOrder.idPurchaseOrder)
+        println("Status Updated")
+        showAllPurchaseOrders()
+      } catch {
+        case noElem:NoSuchElementException => {
+          println("Please enter a valid Purchase Order ID: ")
+          updatePurchaseOrderStatus(readLine())
+        }
       }
-      val statusVal = readLine()
-      purchaseOrderRepo.setStatus(statusVal.toInt, purchaseOrder.idPurchaseOrder)
-      println("Status Updated")
-      showAllPurchaseOrders()
     }
   }
   
@@ -187,15 +194,22 @@ object MainProgram {
   }
   
   private def receivePurchaseOrder(purchaseOrderID:String) {
-    if(!checkForNumberInput(purchaseOrderID) || !purchaseOrderRepo.checkForValidOrderID(purchaseOrderID.toInt)) {
+    if(!checkForNumberInput(purchaseOrderID)) {
       println("Please enter a valid Purchase Order ID: ")
       receivePurchaseOrder(readLine())
     } else {
-      val purchaseOrder = purchaseOrderRepo.getPurchaseOrder(purchaseOrderID.toInt)
-      val purchOrderLines:List[PurchaseOrderLine] = purchaseOrderLineRepo.getPurchaseOrderLines(purchaseOrderID.toInt)
-      displayPurchaseOrderLines(purchOrderLines)
-      println("Enter the order Item ID you wish to store, or type 'return' to return to the order summary page")
-      receivePurchaseOrderLine(readLine(), purchOrderLines, purchaseOrder)
+      try {
+        val purchaseOrder = purchaseOrderRepo.getPurchaseOrder(purchaseOrderID.toInt)
+        val purchOrderLines:List[PurchaseOrderLine] = purchaseOrderLineRepo.getPurchaseOrderLines(purchaseOrderID.toInt)
+        displayPurchaseOrderLines(purchOrderLines)
+        println("Enter the order Item ID you wish to store, or type 'return' to return to the order summary page")
+        receivePurchaseOrderLine(readLine(), purchOrderLines, purchaseOrder)
+      } catch {
+        case noElem:NoSuchElementException => {
+          println("Please enter a valid Purchase Order ID: ")
+          receivePurchaseOrder(readLine())
+        }
+      }
     }
   }
   
@@ -245,14 +259,21 @@ object MainProgram {
   }
   
   private def interpretPurchaseOrderLineRequest(input:String) {
-    if(!checkForNumberInput(input) || !purchaseOrderRepo.checkForValidOrderID(input.toInt)) {
+    if(!checkForNumberInput(input)) {
       println("Please enter a valid Purchase Order ID: ")
-    interpretPurchaseOrderLineRequest(readLine())
+      interpretPurchaseOrderLineRequest(readLine())
     } else {
-      val purchOrderLines:List[PurchaseOrderLine] = purchaseOrderLineRepo.getPurchaseOrderLines(input.toInt)
-      displayPurchaseOrderLines(purchOrderLines)
-      displayPurchaseOrderLineOptions()
-      interpretIndividualPurchaseOrderInstructions(readLine(), purchOrderLines)
+      try {
+        val purchOrderLines:List[PurchaseOrderLine] = purchaseOrderLineRepo.getPurchaseOrderLines(input.toInt)
+        displayPurchaseOrderLines(purchOrderLines)
+        displayPurchaseOrderLineOptions()
+        interpretIndividualPurchaseOrderInstructions(readLine(), purchOrderLines)
+      } catch {
+        case noElem:NoSuchElementException => {
+        println("Please enter a valid Purchase Order ID: ")
+        interpretPurchaseOrderLineRequest(readLine())
+        }
+      }
     }
   }
   

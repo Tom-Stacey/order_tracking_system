@@ -16,6 +16,7 @@ class PurchaseOrderStatusRepository {
   
   /**
    * returns a map of all PurchaseOrderStatuses in the SQL database, ordered by statusID
+   * @return SortedMap[Int,PurchaseOrderStatus]
    */
   def getAllStatuses():SortedMap[Int,PurchaseOrderStatus] = {
     val sql:String = "SELECT idPurchaseOrderStatus, status FROM purchaseorderstatus ORDER BY idPurchaseOrderStatus"
@@ -32,6 +33,7 @@ class PurchaseOrderStatusRepository {
   
   /**
    * returns a single PurchaseOrderStatus entity based on the passed StatusID
+   * @return PurchaseOrderStatus
    */
   def getStatus(id:Int):PurchaseOrderStatus = {
     statuses.getOrElse(id, throw new Error("Couldn't find status with id "+id+" in getStatus() in PurchaseOrderStatusRepository"))
@@ -39,6 +41,7 @@ class PurchaseOrderStatusRepository {
   
   /**
    * returns a map of keys/values for PurchaseOrderStatuses from a ResultSet
+   * @return SortedMap[Int,PurchaseOrderStatus]
    */
   private def createMapFromResultSet(rs:ResultSet):SortedMap[Int,PurchaseOrderStatus] = {
     

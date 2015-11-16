@@ -43,6 +43,7 @@ class UserRepository {
   
   /**
    * returns a single User entity from the passed ResultSet at the ResultSet's current row
+   * @return User
    */
   private def createUserFromResultSet(rs:ResultSet):User = {
     new User(rs.getInt("idUser"),rs.getString("password"),rs.getString("forename"),rs.getString("surname"),rs.getString("email"), rs.getBoolean("isEmployee"))
@@ -50,6 +51,7 @@ class UserRepository {
   
   /**
    * returns true if login details are valid, false if not based on the passed idUSer and password
+   * @return Boolean
    */
   def checkForValidLoginUsingID(userID:String, password:String):Boolean = {
     val sql:String = "SELECT idUser from user where idUser = ? and password = ?"
@@ -69,6 +71,7 @@ class UserRepository {
   
   /**
    * returns true if login details are valid, false if not based on the passed idUSer and password
+   * @return Boolean
    */
   def checkForValidLoginUsingEmail(userEmail:String, password:String):Boolean = {
     val sql:String = "SELECT idUser from user where email = ? and password = ?"

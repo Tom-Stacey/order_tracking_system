@@ -8,6 +8,7 @@ import com.qa.entities.PurchaseOrder
 import com.qa.entities.PurchaseOrderLine
 import com.qa.entities.Location
 import com.mysql.jdbc.CallableStatement
+import java.util.NoSuchElementException
 
 /**
  * @author tstacey
@@ -19,6 +20,7 @@ class PurchaseOrderLineRepository {
   
   /**
    * returns an array of all Purchase order lines corresponding to the passed purchase order ID
+   * @return List[PurchaseOrderLine]
    */
   def getPurchaseOrderLines(PurchaseOrderID:Int): List[PurchaseOrderLine] = {
     val PurchaseOrder = orderRepo.getPurchaseOrder(PurchaseOrderID)
@@ -27,6 +29,7 @@ class PurchaseOrderLineRepository {
   
   /**
    * returns an array of all Purchase order lines that belong to the passed Purchase Order Entity
+   * @return List[PurchaseOrderLine]
    */
   def getPurchaseOrderLines(PurchaseOrder:PurchaseOrder): List[PurchaseOrderLine] = {
     getAllPurchaseOrderLines(PurchaseOrder)
@@ -81,6 +84,8 @@ class PurchaseOrderLineRepository {
   
   /**
    * returns a single Purchase Order Line using the passed item ID and Purchase Order ID
+   * @return PurchaseOrderLine
+   * @throws NoSuchElementException if there is no PurchaseORderLine corresponding to the passed item ID and purchase order ID
    */
   def getPurchaseOrderLine(itemID:Int, purchaseOrderID:Int):PurchaseOrderLine = {
     val sql:String = "SELECT idPurchaseOrder, idItem, quantity, quantityDamaged, stored FROM PurchaseOrderline WHERE idPurchaseOrder = ? AND idItem = ?"
@@ -91,8 +96,11 @@ class PurchaseOrderLineRepository {
     connector.connect()
     try {
       val rs:ResultSet = connector.doPreparedQuery(sql, vars)
-      rs.next()
-      createOrderLineFromResultSetRow(rs)
+      if(!rs.next()) {
+        throw new NoSuchElementException
+      } else {
+        createOrderLineFromResultSetRow(rs)
+      }
     } finally {
       connector.disconnect()
     }
@@ -100,6 +108,7 @@ class PurchaseOrderLineRepository {
   
   /**
    * returns a single Purchase ORder Entity from the current row of the passed ResultSet
+   * @return PurchaseOrderLine
    */
   private def createOrderLineFromResultSetRow(rs:ResultSet):PurchaseOrderLine = {
     val purchOrd = orderRepo.getPurchaseOrder(rs.getInt("idPurchaseOrder"))
@@ -113,6 +122,7 @@ class PurchaseOrderLineRepository {
   
   /**
    * returns true if the passed purchase order line ID has a corresponding Item ID
+   * @return Boolean - true if item is in purchase order line, false if not
    */
   def checkForItemInOrderLine(idPurchaseOrder:Int, idItem:Int):Boolean = {
     
@@ -133,6 +143,7 @@ class PurchaseOrderLineRepository {
   
   /**
    * retrieves all Purchase order lines from the SQL database and returns them as a list of PurchaseOrderLine entities
+   * @return List[PurchaseOrderLine] - all purchase order lines in the database
    */
   private def getAllPurchaseOrderLines(purchOrd:PurchaseOrder): List[PurchaseOrderLine] = {
     val sql:String = "SELECT idItem, quantity, quantityDamaged, stored FROM PurchaseOrderline WHERE idPurchaseOrder = ? ORDER BY idItem"
@@ -165,6 +176,7 @@ class PurchaseOrderLineRepository {
   
   /**
    * creates PurchaseOrderLine entities from the passed ResultSet and returns them as a List
+   * @return List[PurchaseOrderLine]
    */
   private def createPurchaseOrderLinesFromResultSet(rs:ResultSet, purchOrd:PurchaseOrder): List[PurchaseOrderLine] = {
     
@@ -187,6 +199,7 @@ class PurchaseOrderLineRepository {
   
   /**
    * returns an Option[Int] of the quantity damaged if the quantityDamaged Column is not null. Returns None if null
+   * @return Option[Int]
    */
   private def getQuantityDamaged(rs:ResultSet):Option[Int] = {
     val chk = rs.getInt("quantityDamaged")

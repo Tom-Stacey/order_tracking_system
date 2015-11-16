@@ -9,6 +9,7 @@ import com.qa.entities.Employee
 import com.qa.helpers.DateTimeConverter
 import java.time.LocalDate
 import com.qa.entities.PurchaseOrder
+import java.util.NoSuchElementException
 
 /**
  * @author tstacey
@@ -24,6 +25,7 @@ class PurchaseOrderRepository {
   
   /**
    * returns all PurchaseOrder Entities from the SQL database
+   * @return List[PurchaseOrder] - all Purchase Orders in the database
    */
   def getAllPurchaseOrders():List[PurchaseOrder] = {
     val sql:String = "SELECT idPurchaseOrder, datePlaced, dateExpected, idPurchaseOrderStatus, idSupplier, idEmployee FROM purchaseorder"
@@ -38,6 +40,8 @@ class PurchaseOrderRepository {
   
   /**
    * returns a PurchaseOrder Entity from the SQL database corresponding to the passed purchaseOrderID
+   * @return PurchaseOrder
+   * @throws NoSuchElementException if there is no purchase order in the database corresponding to the passed Purchase Order ID
    */
   def getPurchaseOrder(purchaseOrderID:Int):PurchaseOrder = {
     val sql:String = "SELECT idPurchaseOrder, datePlaced, dateExpected, idPurchaseOrderStatus, idSupplier, idEmployee "+
@@ -46,28 +50,16 @@ class PurchaseOrderRepository {
     connector.connect()
     try {
       val rs:ResultSet = connector.doPreparedQuery(sql, vars)
-      rs.next()
-      createPurchaseOrderFromResultSetRow(rs)
+      if(!rs.next()) {
+        throw new NoSuchElementException
+      } else {
+        createPurchaseOrderFromResultSetRow(rs)
+      }
     } finally {
       connector.disconnect()
     }
   }
   
-  /**
-   * returns true if the passed ID corresponds to a Purchase ORder in the SQL database
-   */
-  def checkForValidOrderID(purchaseOrderID:Int):Boolean = {
-    val sql:String = "SELECT idPurchaseOrder "+
-                  "FROM purchaseorder WHERE idPurchaseOrder = ?"
-    val vars:Array[Array[String]] = Array(Array("Int",purchaseOrderID.toString()))
-    connector.connect()
-    try {
-      val rs:ResultSet = connector.doPreparedQuery(sql, vars)
-      rs.next()
-    } finally {
-      connector.disconnect()
-    }
-  }
   
   
   /**

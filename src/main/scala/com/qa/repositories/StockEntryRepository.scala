@@ -14,6 +14,8 @@ class StockEntryRepository {
   
   /**
    * returns a single StockEntry Entity corresponding to the passed itemID and locationID
+   * @return StockEntry
+   * @throws NoSuchElementException if there is none of the passed item ID at the passed Location
    */
   def getStockEntry(itemID:Int, locationID:Int):StockEntry =  {
     val sql:String = "SELECT itemID, quantity, quantityClaimed, location.idLocation, locationName, locationLtrVolume, locationLtrVolumeUsed, locationRow, locationCol "+
@@ -28,8 +30,11 @@ class StockEntryRepository {
     connector.connect()
     try {
       val rs:ResultSet = connector.doPreparedQuery(sql, vars)
-      rs.next()
-      createStockEntryFromResultSetRow(rs)
+      if(!rs.next()) {
+        throw new NoSuchElementException
+      } else {
+        createStockEntryFromResultSetRow(rs)
+      }
     } finally {
       connector.disconnect()
     }
@@ -37,6 +42,7 @@ class StockEntryRepository {
   
   /**
    * Returns a List of StockEntry Entities from the SQL database for all the locations for the passed itemID
+   * @return List[StockEntry]
    */
   def getAllEntriesForItem(itemID:Int):List[StockEntry] = {
     val sql:String = "SELECT itemID, quantity, quantityClaimed, location.idLocation, locationName, locationLtrVolume, locationLtrVolumeUsed, locationRow, locationCol "+
@@ -49,6 +55,7 @@ class StockEntryRepository {
   
   /**
    * Returns a List of StockEntry Entities from the SQL database including all of the Items at the passed locationID
+   * @return List[StockEntry]
    */
   def getAllEntriesForLocation(locationID:Int):List[StockEntry] = {
     val sql:String = "SELECT itemID, quantity, quantityClaimed, location.idLocation, locationName, locationLtrVolume, locationLtrVolumeUsed, locationRow, locationCol "+
@@ -61,6 +68,7 @@ class StockEntryRepository {
   
   /**
    * Returns a List of all StockEntry Entities in the database
+   * @return List[StockEntry] - all StockEntries in the database
    */
   def getAllEntries():List[StockEntry] = {
     val sql:String = "SELECT itemID, quantity, quantityClaimed, location.idLocation, locationName, locationLtrVolume, locationLtrVolumeUsed, locationRow, locationCol "+
@@ -76,6 +84,7 @@ class StockEntryRepository {
   
   /**
    * queries the SQL database using the passed SQL statement and variables and returns all of the returned rows as a list of StockEntry Entities
+   * @return List[StockEntry]
    */
   private def getEntriesListFromQuery(sql:String, vars:Array[Array[String]]):List[StockEntry] = {
     connector.connect()
@@ -89,6 +98,7 @@ class StockEntryRepository {
   
   /**
    * returns a single StockEntry Entity from the current row of the passed ResultSet
+   * @return StockEntry
    */
   private def createStockEntryFromResultSetRow(rs:ResultSet):StockEntry =  {
     val loc = new Location(rs.getInt("idLocation"), rs.getString("locationName"), rs.getInt("locationLtrVolume"),
@@ -99,6 +109,7 @@ class StockEntryRepository {
   
   /**
    * Returns a List of StockEntry Entities from the passed ResultSet
+   * @return List[StockEntry]
    */
   private def createStockEntriesFromResultSet(rs:ResultSet):List[StockEntry] = {
     
